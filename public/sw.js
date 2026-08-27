@@ -4,10 +4,8 @@ const RUNTIME_CACHE = `counters-runtime-${CACHE_VERSION}`
 
 const ASSETS_TO_CACHE = [
   '/',
-  '/icon.svg',
-  '/apple-icon.png',
-  '/icon-dark-32x32.png',
-  '/icon-light-32x32.png',
+  '/32.png',
+  '/1024.png',
   '/manifest.json'
 ]
 

@@ -10,24 +10,16 @@
   "theme_color": "#f4f3f8",
   "icons": [
     {
-      "src": "/apple-icon.png",
-      "sizes": "180x180",
+      "src": "/32.png",
+      "sizes": "32x32",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "/apple-icon.png",
-      "sizes": "540x720",
+      "src": "/1024.png",
+      "sizes": "1024x1024",
       "type": "image/png",
-      "form_factor": "narrow"
+      "purpose": "any maskable"
     }
   ],
   "categories": ["games", "utilities"],

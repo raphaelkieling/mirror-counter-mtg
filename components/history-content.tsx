@@ -12,7 +12,7 @@ export function HistoryContent({ history }: { history: HistoryEntry[] }) {
           [...history].reverse().slice(0, 20).map((entry, index) => (
             <div className="history-row" key={`${entry.at}-${index}`}>
               <span>{entry.value} LIFE</span>
-              <time>{new Date(entry.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
+              <time suppressHydrationWarning>{new Date(entry.at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</time>
             </div>
           ))
         ) : (
