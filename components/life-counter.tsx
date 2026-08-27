@@ -1,15 +1,17 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Check, Clock3, Minus, Plus, RotateCcw, Settings2, SlidersHorizontal, X } from 'lucide-react'
+import { Clock3, Settings2 } from 'lucide-react'
 import { GameSettings } from './game-settings'
 import { PlayerSettings } from './player-settings'
 import { HistoryContent } from './history-content'
+import { Dialog } from './dialog'
+import { PlayerPanel } from './player-panel'
+import { RadialMenu } from './radial-menu'
 
 type HistoryEntry = { value: number; at: string }
 type Player = { id: number; name: string; color: string; life: number; history: HistoryEntry[]; inverted?: boolean }
 
-const PALETTE = ['#ff174e', '#4652f5', '#18b887', '#f59e0b', '#d946ef', '#0ea5e9']
 const STORAGE_KEY = 'mana-counter-v1'
 const defaultPlayers: Player[] = [
   { id: 1, name: 'PLAYER 1', color: '#ff174e', life: 20, history: [], inverted: true },
@@ -22,60 +24,6 @@ function contrast(color: string) {
   const g = Number.parseInt(hex.slice(2, 4), 16)
   const b = Number.parseInt(hex.slice(4, 6), 16)
   return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#111111' : '#ffffff'
-}
-
-function Dialog({ isOpen, onClose, icon: Icon, eyebrow, title, children }: { isOpen: boolean; onClose: () => void; icon?: React.ElementType; eyebrow: string; title: string; children: React.ReactNode }) {
-  if (!isOpen) return null
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <aside className="settings-sheet" onClick={(event) => event.stopPropagation()}>
-        <div className="sheet-heading">
-          <div>
-            <p className="eyebrow">{Icon && <Icon size={14} style={{ display: 'inline', marginRight: '4px' }} />}{eyebrow}</p>
-            <h2>{title}</h2>
-          </div>
-          <button className="close-button" onClick={onClose} aria-label="Close"><X size={20} /></button>
-        </div>
-        {children}
-      </aside>
-    </div>
-  )
-}
-
-function RadialMenu({ isOpen, onToggle, onRestart, onConfig }: { isOpen: boolean; onToggle: () => void; onRestart: () => void; onConfig: () => void }) {
-  return (
-    <>
-      {isOpen && <div className="radial-backdrop" onClick={onToggle} />}
-      <div className="radial-container">
-        {isOpen && <div className="radial-menu" role="menu" aria-label="Game options"><button className="radial-action radial-action-restart" onClick={onRestart} role="menuitem" aria-label="Restart"><RotateCcw size={20} /></button><button className="radial-action radial-action-config" onClick={onConfig} role="menuitem" aria-label="Configuration"><Settings2 size={20} /></button></div>}
-        <button className={`option-button ${isOpen ? 'is-open' : ''}`} onClick={onToggle} aria-expanded={isOpen} aria-label={isOpen ? 'Close options' : 'Open options'}><SlidersHorizontal size={18} /></button>
-      </div>
-    </>
-  )
-}
-
-function PlayerPanel({ player, onChange, onSettings, onHistory, hasPendingHistory, onSaveHistory }: { player: Player; onChange: (delta: number) => void; onSettings: () => void; onHistory: () => void; hasPendingHistory: boolean; onSaveHistory: () => void }) {
-  const text = contrast(player.color)
-  const hasHistory = player.history.length > 0
-  return (
-    <section className="player-panel" style={{ backgroundColor: player.color, color: text, transform: player.inverted ? 'rotate(180deg)' : undefined }} aria-label={`${player.name} life counter`}>
-      <div className="player-topline">
-        <span className="player-name">{player.name}</span>
-        <div className="player-icons">
-          <button className="icon-button" style={{ color: text, opacity: hasHistory ? 1 : 0.4 }} onClick={onHistory} disabled={!hasHistory} aria-label={`View ${player.name} history`}><Clock3 size={18} strokeWidth={2.2} /></button>
-          <button className="icon-button" style={{ color: text }} onClick={onSettings} aria-label={`Configure ${player.name}`}><Settings2 size={18} strokeWidth={2.2} /></button>
-        </div>
-      </div>
-      <div className="life-row">
-        <button className="life-adjust" style={{ color: text }} onClick={() => onChange(-1)} aria-label={`Subtract life from ${player.name}`}><Minus size={18} /></button>
-        <output className="life-value" aria-label={`${player.life} life`}>{player.life}</output>
-        <button className="life-adjust" style={{ color: text }} onClick={() => onChange(1)} aria-label={`Add life to ${player.name}`}><Plus size={18} /></button>
-      </div>
-      <div className="player-footer">
-        {hasPendingHistory && <button className="save-history-btn" onClick={onSaveHistory} style={{ color: text }} aria-label="Save history now"><Check size={16} strokeWidth={2.5} /></button>}
-      </div>
-    </section>
-  )
 }
 
 export default function LifeCounter() {
@@ -93,14 +41,24 @@ export default function LifeCounter() {
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY)
     if (stored) {
-      try { const value = JSON.parse(stored); setPlayers(value.players ?? defaultPlayers); setStartLife(value.startLife ?? 20); setHistoryDelay(value.historyDelay ?? 2); setCloseRadialOnDialog(value.closeRadialOnDialog ?? true) } catch { /* use defaults */ }
+      try {
+        const value = JSON.parse(stored)
+        const loadedPlayers = (value.players ?? defaultPlayers).map((p: any) => ({ ...p, history: p.history ?? [] }))
+        setPlayers(loadedPlayers)
+        setStartLife(value.startLife ?? 20)
+        setHistoryDelay(value.historyDelay ?? 2)
+        setCloseRadialOnDialog(value.closeRadialOnDialog ?? true)
+      } catch { /* use defaults */ }
     }
     setHydrated(true)
   }, [])
 
   useEffect(() => {
     if (!hydrated) return
-    const timeout = window.setTimeout(() => window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players, startLife, historyDelay, closeRadialOnDialog })), 3000)
+    const timeout = window.setTimeout(() => {
+      const playersToSave = players.map(({ id, name, color, life, inverted }) => ({ id, name, color, life, inverted }))
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players: playersToSave, startLife, historyDelay, closeRadialOnDialog }))
+    }, 500)
     return () => window.clearTimeout(timeout)
   }, [players, startLife, historyDelay, closeRadialOnDialog, hydrated])
 
@@ -128,6 +86,8 @@ export default function LifeCounter() {
   }
   function updateColor(color: string) { setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, color } : player)) }
   function toggleInverted() { setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, inverted: !player.inverted } : player)) }
+
+  if (!hydrated) return null
 
   return (
     <main className="counter-shell">
