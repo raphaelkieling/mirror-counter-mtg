@@ -33,6 +33,7 @@ export default function LifeCounter() {
   const [closeRadialOnDialog, setCloseRadialOnDialog] = useState(true)
   const [showTime, setShowTime] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
+  const [showPlayerName, setShowPlayerName] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [pendingHistoryIds, setPendingHistoryIds] = useState<Set<number>>(new Set())
@@ -53,6 +54,7 @@ export default function LifeCounter() {
         setHistoryDelay(value.historyDelay ?? 2)
         setCloseRadialOnDialog(value.closeRadialOnDialog ?? true)
         setShowTime(value.showTime ?? false)
+        setShowPlayerName(value.showPlayerName ?? false)
         const isDarkMode = value.darkMode ?? false
         setDarkMode(isDarkMode)
         if (isDarkMode) {
@@ -76,10 +78,10 @@ export default function LifeCounter() {
     if (!hydrated) return
     const timeout = window.setTimeout(() => {
       const playersToSave = players.map(({ id, name, color, life, inverted, history }) => ({ id, name, color, life, inverted, history }))
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players: playersToSave, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode }))
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players: playersToSave, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode, showPlayerName }))
     }, 500)
     return () => window.clearTimeout(timeout)
-  }, [players, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode, hydrated])
+  }, [players, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode, showPlayerName, hydrated])
 
   useEffect(() => {
     if (!showTime) return
@@ -144,7 +146,7 @@ export default function LifeCounter() {
     <main className="counter-shell">
       <div className="counter-frame">
         <div className="players-stack">
-          {players.map((player) => <PlayerPanel key={player.id} player={player} onChange={(delta) => changeLife(player.id, delta)} onSettings={() => setSettingsId(player.id)} onHistory={() => setHistoryId(player.id)} hasPendingHistory={pendingHistoryIds.has(player.id)} onSaveHistory={() => saveHistory(player.id)} />)}
+          {players.map((player) => <PlayerPanel key={player.id} player={player} showPlayerName={showPlayerName} onChange={(delta) => changeLife(player.id, delta)} onSettings={() => setSettingsId(player.id)} onHistory={() => setHistoryId(player.id)} hasPendingHistory={pendingHistoryIds.has(player.id)} onSaveHistory={() => saveHistory(player.id)} />)}
         </div>
         <RadialMenu isOpen={menuOpen} onToggle={() => setMenuOpen((open) => !open)} onRestart={restart} onConfig={() => { setSettingsId(-1); if (closeRadialOnDialog) setMenuOpen(false); }} onAbout={() => { setAboutOpen(true); if (closeRadialOnDialog) setMenuOpen(false); }} />
         {showTime && <div className="current-time">{currentTime}</div>}
@@ -152,7 +154,7 @@ export default function LifeCounter() {
 
       <Dialog isOpen={settingsId !== null} onClose={() => setSettingsId(null)} icon={Settings2} eyebrow="SETTINGS" title={settingsId === -1 ? 'Game configuration' : activePlayer?.name ?? ''}>
         {settingsId === -1 ? (
-          <GameSettings startLife={startLife} historyDelay={historyDelay} closeRadialOnDialog={closeRadialOnDialog} showTime={showTime} darkMode={darkMode} onStartLifeChange={setStartLife} onHistoryDelayChange={setHistoryDelay} onCloseRadialOnDialogChange={setCloseRadialOnDialog} onShowTimeChange={setShowTime} onDarkModeChange={setDarkMode} />
+          <GameSettings startLife={startLife} historyDelay={historyDelay} closeRadialOnDialog={closeRadialOnDialog} showTime={showTime} darkMode={darkMode} showPlayerName={showPlayerName} onStartLifeChange={setStartLife} onHistoryDelayChange={setHistoryDelay} onCloseRadialOnDialogChange={setCloseRadialOnDialog} onShowTimeChange={setShowTime} onDarkModeChange={setDarkMode} onShowPlayerNameChange={setShowPlayerName} />
         ) : (
           <PlayerSettings player={activePlayer} onColorChange={updateColor} onInvertedChange={toggleInverted} />
         )}

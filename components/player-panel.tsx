@@ -11,13 +11,13 @@ function contrast(color: string) {
   return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#111111' : '#ffffff'
 }
 
-export function PlayerPanel({ player, onChange, onSettings, onHistory, hasPendingHistory, onSaveHistory }: { player: Player; onChange: (delta: number) => void; onSettings: () => void; onHistory: () => void; hasPendingHistory: boolean; onSaveHistory: () => void }) {
+export function PlayerPanel({ player, showPlayerName, onChange, onSettings, onHistory, hasPendingHistory, onSaveHistory }: { player: Player; showPlayerName: boolean; onChange: (delta: number) => void; onSettings: () => void; onHistory: () => void; hasPendingHistory: boolean; onSaveHistory: () => void }) {
   const text = contrast(player.color)
   const hasHistory = player.history.length > 0
   return (
     <section className="player-panel" style={{ backgroundColor: player.color, color: text, transform: player.inverted ? 'rotate(180deg)' : undefined }} aria-label={`${player.name} life counter`}>
       <div className="player-topline">
-        <span className="player-name">{player.name}</span>
+        <span className="player-name" style={{ visibility: showPlayerName ? 'visible' : 'hidden' }}>{player.name}</span>
         <div className="player-icons">
           <button className="icon-button" style={{ color: text, opacity: hasHistory ? 1 : 0.4 }} onClick={onHistory} disabled={!hasHistory} aria-label={`View ${player.name} history`}><Clock3 size={18} strokeWidth={2.2} /></button>
           <button className="icon-button" style={{ color: text }} onClick={onSettings} aria-label={`Configure ${player.name}`}><Settings2 size={18} strokeWidth={2.2} /></button>
