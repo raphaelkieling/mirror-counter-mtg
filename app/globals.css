@@ -181,13 +181,13 @@ button {
     z-index: 3;
 }
 .radial-backdrop {
-    position: fixed;
+    position: absolute;
     inset: 0;
     z-index: 2;
     background: rgb(16 16 20 / 25%);
 }
 .radial-container {
-    position: fixed;
+    position: absolute;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
