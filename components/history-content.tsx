@@ -5,7 +5,7 @@ import { HistoryChart } from './history-chart'
 
 export function HistoryContent({ history }: { history: HistoryEntry[] }) {
   return (
-    <>
+    <div className="settings-content">
       <HistoryChart history={history} maxLife={20} />
       <div className="history-list">
         {history.length ? (
@@ -19,6 +19,6 @@ export function HistoryContent({ history }: { history: HistoryEntry[] }) {
           <p className="empty-history">Changes will appear here after you play.</p>
         )}
       </div>
-    </>
+    </div>
   )
 }

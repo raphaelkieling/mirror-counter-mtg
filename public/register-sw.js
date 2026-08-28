@@ -10,3 +10,21 @@ if ('serviceWorker' in navigator) {
     }
   })
 }
+
+let deferredPrompt
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault()
+  deferredPrompt = e
+  window.dispatchEvent(new CustomEvent('pwa-installable'))
+})
+
+window.installPWA = async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+    console.log(`User response to the install prompt: ${outcome}`)
+    deferredPrompt = null
+    window.dispatchEvent(new CustomEvent('pwa-installed'))
+  }
+}

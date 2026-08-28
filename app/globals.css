@@ -310,6 +310,7 @@ button {
     box-shadow: 0 -12px 40px rgb(0 0 0 / 12%);
     max-height: 80svh;
     overflow-x: hidden;
+    overflow-y: auto;
     scrollbar-gutter: stable;
 }
 .sheet-heading {
@@ -332,7 +333,7 @@ h2 {
 .close-button {
     color: var(--muted);
 }
-.settings-sheet > *:not(.sheet-heading) {
+.settings-content {
     padding: 0 24px;
 }
 .section-label,

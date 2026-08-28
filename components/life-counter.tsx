@@ -142,9 +142,9 @@ export default function LifeCounter() {
       <Dialog isOpen={historyId !== null} onClose={() => setHistoryId(null)} icon={Clock3} eyebrow="HISTORY" title={players.find(p => p.id === historyId)?.name ?? ''}>
         <HistoryContent history={players.find(p => p.id === historyId)?.history ?? []} />
       </Dialog>
-      <Dialog isOpen={aboutOpen} onClose={() => setAboutOpen(false)} icon={Info} eyebrow="ABOUT" title="Counters">
-        <div className="dialog-content">
-          <p>A fast, simple life counter for tabletop games.</p>
+      <Dialog isOpen={aboutOpen} onClose={() => setAboutOpen(false)} icon={Info} eyebrow="ABOUT" title="Mirror Counter">
+        <div className="settings-content">
+          <p>A fast, simple life counter for Magic: The Gathering 1x1 format.</p>
           <p style={{ marginTop: '16px', fontSize: '14px', color: '#666' }}>Created by <strong>Raphael Kieling</strong></p>
           <p style={{ fontSize: '14px', color: '#666' }}>© 2026</p>
           <button onClick={fillDemoData} style={{ marginTop: '24px', width: '100%', padding: '12px', borderRadius: '8px', border: 'none', background: '#d9d7df', color: '#111116', fontWeight: '700', cursor: 'pointer' }}>Fill out with demo content</button>
