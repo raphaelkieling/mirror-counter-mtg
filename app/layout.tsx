@@ -49,6 +49,7 @@ export const viewport: Viewport = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // Layout
   return (
     <html lang="en" className={`bg-background ${varelaRound.className}`}>
       <head>
