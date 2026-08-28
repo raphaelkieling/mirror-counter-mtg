@@ -43,6 +43,8 @@ button {
     width: 100vw;
     height: 100svh;
     display: flex;
+    padding-bottom: max(0px, env(safe-area-inset-bottom));
+    box-sizing: border-box;
 }
 .counter-frame {
     width: 100%;
@@ -465,7 +467,6 @@ h2 {
         padding-top: max(0px, env(safe-area-inset-top));
         padding-left: 12px;
         padding-right: 12px;
-        padding-bottom: max(0px, env(safe-area-inset-bottom));
     }
     .player-panel {
         min-height: 35svh;
