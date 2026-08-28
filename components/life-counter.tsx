@@ -80,8 +80,12 @@ export default function LifeCounter() {
   const activePlayer = useMemo(() => players.find((player) => player.id === settingsId), [players, settingsId])
 
   function changeLife(id: number, delta: number) {
-    if ('vibrate' in navigator) {
-      navigator.vibrate(30)
+    try {
+      if (navigator.vibrate) {
+        navigator.vibrate([20, 10, 20])
+      }
+    } catch (e) {
+      console.log('Vibration not available')
     }
     setPlayers((current) => current.map((player) => player.id === id ? { ...player, life: Math.max(0, player.life + delta) } : player))
     window.clearTimeout(historyTimers.current[id])
