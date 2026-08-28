@@ -609,19 +609,69 @@ html.dark .number-value {
     gap: 5px;
 }
 .history-list {
-    border-top: 1px solid var(--line);
+    padding: 12px 0 0 0;
+    margin-top: 24px;
 }
+
 .history-row {
     display: flex;
     justify-content: space-between;
-    padding: 11px 0;
-    border-bottom: 1px solid var(--line);
-    font-size: 13px;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 500;
+    text-align: left;
+    transition: all 0.15s ease;
+    width: calc(100% + 48px);
+    box-sizing: border-box;
+    border: none;
+    border-top: 1px solid var(--line);
+    margin-left: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
 }
+
+.history-row:first-child {
+    border-top: none;
+}
+
+.history-row:hover {
+    opacity: 0.8;
+}
+
+.history-life {
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.history-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.history-time {
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.history-icon {
+    color: var(--muted);
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
 .history-row time,
 .empty-history {
     color: var(--muted);
-    font-size: 12px;
+    font-size: 16px;
 }
 .empty-history {
     padding: 15px 0;

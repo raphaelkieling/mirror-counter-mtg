@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Clock3, Settings2, Info } from 'lucide-react'
+import { Clock3, Settings2, Info, GitBranch } from 'lucide-react'
 import { GameSettings } from './game-settings'
 import { PlayerSettings } from './player-settings'
 import { HistoryContent } from './history-content'
@@ -9,7 +9,7 @@ import { Dialog } from './dialog'
 import { PlayerPanel } from './player-panel'
 import { RadialMenu } from './radial-menu'
 
-type HistoryEntry = { value: number; at: string }
+type HistoryEntry = { value: number; at: string; isRollback?: boolean }
 type Player = { id: number; name: string; color: string; life: number; history: HistoryEntry[]; inverted?: boolean }
 
 const STORAGE_KEY = 'mana-counter-v1'
@@ -43,6 +43,7 @@ export default function LifeCounter() {
   const [historyId, setHistoryId] = useState<number | null>(null)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [hydrated, setHydrated] = useState(false)
+  const [rollbackConfirmation, setRollbackConfirmation] = useState<{ playerId: number; value: number } | null>(null)
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY)
@@ -123,6 +124,10 @@ export default function LifeCounter() {
   }
   function updateColor(color: string) { setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, color } : player)) }
   function toggleInverted() { setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, inverted: !player.inverted } : player)) }
+  function applyRollback(playerId: number, value: number) {
+    setPlayers((current) => current.map((player) => player.id === playerId ? { ...player, life: value, history: [...player.history, { value, at: new Date().toISOString(), isRollback: true }] } : player))
+    setRollbackConfirmation(null)
+  }
   function fillDemoData() {
     const now = new Date()
     const generateHistory = (startLife: number, finalLife: number, count: number) => {
@@ -131,7 +136,7 @@ export default function LifeCounter() {
       for (let i = 0; i < count; i++) {
         const value = Math.round(startLife - step * i)
         const time = new Date(now.getTime() - (count - i) * 30000)
-        history.push({ value, at: time.toISOString() })
+        history.push({ value, at: time.toISOString(), isRollback: false })
       }
       return history
     }
@@ -162,7 +167,17 @@ export default function LifeCounter() {
         )}
       </Dialog>
       <Dialog isOpen={historyId !== null} onClose={() => setHistoryId(null)} icon={Clock3} eyebrow="HISTORY" title={players.find(p => p.id === historyId)?.name ?? ''} isInverted={players.find(p => p.id === historyId)?.inverted}>
-        <HistoryContent history={players.find(p => p.id === historyId)?.history ?? []} />
+        <HistoryContent history={players.find(p => p.id === historyId)?.history ?? []} onSelectRollback={historyId !== null ? (value) => setRollbackConfirmation({ playerId: historyId, value }) : undefined} />
+      </Dialog>
+
+      <Dialog isOpen={rollbackConfirmation !== null} onClose={() => setRollbackConfirmation(null)} eyebrow="CONFIRM" title="Rollback life?">
+        <div className="settings-content">
+          <p style={{ marginBottom: '24px' }}>Set life to <strong>{rollbackConfirmation?.value}</strong>?</p>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button onClick={() => setRollbackConfirmation(null)} style={{ flex: 1, padding: '12px', border: '1px solid var(--line)', borderRadius: '8px', background: 'transparent', cursor: 'pointer' }}>Cancel</button>
+            <button onClick={() => rollbackConfirmation && applyRollback(rollbackConfirmation.playerId, rollbackConfirmation.value)} style={{ flex: 1, padding: '12px', border: 'none', borderRadius: '8px', background: '#4652f5', color: '#fff', cursor: 'pointer', fontWeight: 'bold' }}>Confirm</button>
+          </div>
+        </div>
       </Dialog>
       <Dialog isOpen={aboutOpen} onClose={() => setAboutOpen(false)} icon={Info} eyebrow="ABOUT" title="Mirror Counter">
         <div className="settings-content">
