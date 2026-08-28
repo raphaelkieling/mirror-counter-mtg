@@ -109,14 +109,6 @@ export default function LifeCounter() {
     posthog.capture('dark_mode_toggled', { dark_mode: darkMode })
   }, [darkMode, posthog])
 
-  useEffect(() => {
-    const colorCounts = players.reduce((acc, player) => {
-      acc[player.color] = (acc[player.color] || 0) + 1
-      return acc
-    }, {} as Record<string, number>)
-    posthog.capture('colors_used', { colors: colorCounts })
-  }, [players, posthog])
-
   const activePlayer = useMemo(() => players.find((player) => player.id === settingsId), [players, settingsId])
 
   function changeLife(id: number, delta: number) {
@@ -142,7 +134,10 @@ export default function LifeCounter() {
     setPlayers((current) => current.map((player) => ({ ...player, life: startLife, history: [] })))
     setMenuOpen(false)
   }
-  function updateColor(color: string) { setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, color } : player)) }
+  function updateColor(color: string) {
+    posthog.capture('color_changed', { player_id: settingsId, color })
+    setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, color } : player))
+  }
   function toggleInverted() { setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, inverted: !player.inverted } : player)) }
   function applyRollback(playerId: number, value: number) {
     posthog.capture('rollback_applied', { player_id: playerId, new_life: value })
