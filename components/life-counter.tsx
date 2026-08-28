@@ -200,6 +200,10 @@ export default function LifeCounter() {
           <p>A fast, simple life counter for Magic: The Gathering 1x1 format.</p>
           <p style={{ marginTop: '16px', fontSize: '14px', color: '#666' }}>Created by <strong>Raphael Kieling</strong></p>
           <p style={{ fontSize: '14px', color: '#666' }}>© 2026</p>
+          <p style={{ marginTop: '24px', fontSize: '12px', color: '#999', fontFamily: 'monospace' }}>
+            Deployment: {process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_ID}<br />
+            Environment: {process.env.NEXT_PUBLIC_VERCEL_ENV}
+          </p>
         </div>
       </Dialog>
     </main>
