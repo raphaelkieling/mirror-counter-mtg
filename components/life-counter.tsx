@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Clock3, Settings2, Info, GitBranch } from 'lucide-react'
+import { usePostHog } from 'posthog-js/react'
 import { GameSettings } from './game-settings'
 import { PlayerSettings } from './player-settings'
 import { HistoryContent } from './history-content'
@@ -27,6 +28,7 @@ function contrast(color: string) {
 }
 
 export default function LifeCounter() {
+  const posthog = usePostHog()
   const [players, setPlayers] = useState(defaultPlayers)
   const [startLife, setStartLife] = useState(20)
   const [historyDelay, setHistoryDelay] = useState(2)
@@ -97,6 +99,24 @@ export default function LifeCounter() {
     return () => window.clearInterval(interval)
   }, [showTime])
 
+  useEffect(() => {
+    if (historyId !== null) {
+      posthog.capture('history_opened', { player_id: historyId })
+    }
+  }, [historyId, posthog])
+
+  useEffect(() => {
+    posthog.capture('dark_mode_toggled', { dark_mode: darkMode })
+  }, [darkMode, posthog])
+
+  useEffect(() => {
+    const colorCounts = players.reduce((acc, player) => {
+      acc[player.color] = (acc[player.color] || 0) + 1
+      return acc
+    }, {} as Record<string, number>)
+    posthog.capture('colors_used', { colors: colorCounts })
+  }, [players, posthog])
+
   const activePlayer = useMemo(() => players.find((player) => player.id === settingsId), [players, settingsId])
 
   function changeLife(id: number, delta: number) {
@@ -125,6 +145,7 @@ export default function LifeCounter() {
   function updateColor(color: string) { setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, color } : player)) }
   function toggleInverted() { setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, inverted: !player.inverted } : player)) }
   function applyRollback(playerId: number, value: number) {
+    posthog.capture('rollback_applied', { player_id: playerId, new_life: value })
     setPlayers((current) => current.map((player) => player.id === playerId ? { ...player, life: value, history: [...player.history, { value, at: new Date().toISOString(), isRollback: true }] } : player))
     setRollbackConfirmation(null)
   }
