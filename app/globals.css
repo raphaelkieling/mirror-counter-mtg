@@ -2,6 +2,14 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@font-face {
+    font-family: mtg;
+    src: url(/fonts/medium.woff2) format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
@@ -156,11 +164,11 @@ html.dark .counter-frame {
     gap: 20px;
 }
 .life-value {
-    font-size: 110px !important;
+    font-size: 140px !important;
     font-weight: 500 !important;
     line-height: 0.78 !important;
-    font-family: var(--font-sans), sans-serif !important;
-    letter-spacing: -0.09em;
+    font-family: mtg, var(--font-sans), sans-serif !important;
+    letter-spacing: 0.05em;
     font-variant-numeric: tabular-nums;
 }
 .life-adjust {
@@ -173,6 +181,7 @@ html.dark .counter-frame {
     background: transparent;
     opacity: 0.6;
     font-size: 64px;
+    font-family: mtg;
     transition: transform 0.15s ease;
 }
 .life-adjust:active {
@@ -522,6 +531,7 @@ html.dark .swatch {
     cursor: pointer;
     font-size: 16px;
     font-weight: 600;
+    font-family: mtg;
     transition: all 0.2s ease;
 }
 .number-btn:hover {
