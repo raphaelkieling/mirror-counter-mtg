@@ -5,6 +5,7 @@ import { Check, Maximize, Download } from 'lucide-react'
 
 export function GameSettings({ startLife, historyDelay, closeRadialOnDialog, showTime, onStartLifeChange, onHistoryDelayChange, onCloseRadialOnDialogChange, onShowTimeChange }: { startLife: number; historyDelay: number; closeRadialOnDialog: boolean; showTime: boolean; onStartLifeChange: (value: number) => void; onHistoryDelayChange: (value: number) => void; onCloseRadialOnDialogChange: (value: boolean) => void; onShowTimeChange: (value: boolean) => void }) {
   const [canInstallPWA, setCanInstallPWA] = useState(false)
+  const [isIOS, setIsIOS] = useState(false)
 
   useEffect(() => {
     const handlePWAInstallable = () => setCanInstallPWA(true)
@@ -12,6 +13,9 @@ export function GameSettings({ startLife, historyDelay, closeRadialOnDialog, sho
 
     window.addEventListener('pwa-installable', handlePWAInstallable)
     window.addEventListener('pwa-installed', handlePWAInstalled)
+
+    const iosCheck = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    setIsIOS(iosCheck)
 
     return () => {
       window.removeEventListener('pwa-installable', handlePWAInstallable)
@@ -28,7 +32,9 @@ export function GameSettings({ startLife, historyDelay, closeRadialOnDialog, sho
   }
 
   const handleInstallPWA = () => {
-    if (window.installPWA) {
+    if (isIOS) {
+      alert('To install Mirror Counter on iOS:\n\n1. Tap the Share button (box with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right corner\n\nThe app will appear on your home screen!')
+    } else if (window.installPWA) {
       window.installPWA()
     }
   }
@@ -40,8 +46,8 @@ export function GameSettings({ startLife, historyDelay, closeRadialOnDialog, sho
       <div className="toggle-row" style={{ justifyContent: 'space-between' }}><span className="toggle-label">Close menu when opening dialogs</span><button className="checkbox-toggle" onClick={() => onCloseRadialOnDialogChange(!closeRadialOnDialog)} aria-label="Toggle close radial on dialog" style={{ borderColor: closeRadialOnDialog ? '#4652f5' : '#d9d7df', backgroundColor: closeRadialOnDialog ? '#4652f5' : 'transparent' }}>{closeRadialOnDialog && <Check size={16} color="#fff" strokeWidth={3} />}</button></div>
       <div className="toggle-row" style={{ justifyContent: 'space-between' }}><span className="toggle-label">Show current time</span><button className="checkbox-toggle" onClick={() => onShowTimeChange(!showTime)} aria-label="Toggle show time" style={{ borderColor: showTime ? '#4652f5' : '#d9d7df', backgroundColor: showTime ? '#4652f5' : 'transparent' }}>{showTime && <Check size={16} color="#fff" strokeWidth={3} />}</button></div>
       <div style={{ display: 'flex', gap: '12px', marginTop: '26px', flexDirection: 'column' }}>
-        {canInstallPWA && <button onClick={handleInstallPWA} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '8px', border: 'none', background: '#4652f5', color: '#fff', fontWeight: '700', cursor: 'pointer', fontSize: '14px' }}><Download size={18} />Install PWA</button>}
-        <button onClick={handleFullscreen} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '8px', border: 'none', background: '#4652f5', color: '#fff', fontWeight: '700', cursor: 'pointer', fontSize: '14px' }}><Maximize size={18} />Fullscreen mode</button>
+        {(isIOS || canInstallPWA) && <button onClick={handleInstallPWA} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '8px', border: 'none', background: '#4652f5', color: '#fff', fontWeight: '700', cursor: 'pointer', fontSize: '14px' }}><Download size={18} />Install PWA</button>}
+        {!isIOS && <button onClick={handleFullscreen} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '12px', borderRadius: '8px', border: 'none', background: '#4652f5', color: '#fff', fontWeight: '700', cursor: 'pointer', fontSize: '14px' }}><Maximize size={18} />Fullscreen mode</button>}
       </div>
     </div>
   )
