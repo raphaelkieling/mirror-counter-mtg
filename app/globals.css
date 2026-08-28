@@ -45,6 +45,8 @@ button {
     width: 100vw;
     height: 100vh;
     display: flex;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: border-box;
 }
 .counter-frame {
     width: 100%;
