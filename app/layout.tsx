@@ -12,7 +12,6 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
     title: 'Counters',
   },
   formatDetection: {
@@ -38,7 +37,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="icon" href="/32.png" type="image/png" />
         <link rel="apple-touch-icon" href="/1024.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Counters" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
