@@ -13,6 +13,11 @@ A fast, simple life counter for Magic: The Gathering 1x1 format.
 🏠 **Install as PWA** – Add to home screen for native app experience  
 🌐 **No internet required** – Works completely offline with service workers  
 
+
+<img src="./public/screenshot.png" alt="drawing" width="200"/>
+<img src="./public/screenshot-3.png" alt="drawing" width="200"/>
+
+
 ## Getting Started
 
 ### Install as PWA (Recommended)
