@@ -547,6 +547,10 @@ html.dark .number-btn:hover {
     font-weight: 600;
     color: #111116;
 }
+
+html.dark .number-value {
+    color: #f5f5fa;
+}
 .history-title {
     display: flex;
     align-items: center;

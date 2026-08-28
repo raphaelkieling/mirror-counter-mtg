@@ -53,7 +53,11 @@ export default function LifeCounter() {
         setHistoryDelay(value.historyDelay ?? 2)
         setCloseRadialOnDialog(value.closeRadialOnDialog ?? true)
         setShowTime(value.showTime ?? false)
-        setDarkMode(value.darkMode ?? false)
+        const isDarkMode = value.darkMode ?? false
+        setDarkMode(isDarkMode)
+        if (isDarkMode) {
+          document.documentElement.classList.add('dark')
+        }
       } catch { /* use defaults */ }
     }
 
@@ -161,7 +165,6 @@ export default function LifeCounter() {
           <p>A fast, simple life counter for Magic: The Gathering 1x1 format.</p>
           <p style={{ marginTop: '16px', fontSize: '14px', color: '#666' }}>Created by <strong>Raphael Kieling</strong></p>
           <p style={{ fontSize: '14px', color: '#666' }}>© 2026</p>
-          {process.env.NEXT_PUBLIC_SHOW_DEMO === 'true' && <button onClick={fillDemoData} style={{ marginTop: '24px', width: '100%', padding: '12px', borderRadius: '8px', border: 'none', background: '#d9d7df', color: '#111116', fontWeight: '700', cursor: 'pointer' }}>Fill out with demo content</button>}
         </div>
       </Dialog>
     </main>
