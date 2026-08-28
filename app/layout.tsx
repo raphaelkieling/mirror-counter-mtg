@@ -1,48 +1,54 @@
-import { Analytics } from '@vercel/analytics/next'
-import { Varela_Round } from 'next/font/google'
-import type { Metadata, Viewport } from 'next'
-import { HapticProvider } from '@/components/haptic-provider'
-import './globals.css'
+import { Analytics } from "@vercel/analytics/next";
+import { Varela_Round } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import type { Metadata, Viewport } from "next";
 
-const varelaRound = Varela_Round({ weight: '400', subsets: ['latin'] })
+import "./globals.css";
+
+const varelaRound = Varela_Round({ weight: "400", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: 'Mirror Counter',
-  description: 'A fast, simple life counter for Magic: The Gathering 1x1 format.',
-  generator: 'v0.app',
-  manifest: '/manifest.json',
+  title: "Mirror Counter",
+  description:
+    "A fast, simple life counter for Magic: The Gathering 1x1 format.",
+  generator: "v0.app",
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    title: 'Mirror Counter',
+    title: "Mirror Counter",
   },
   formatDetection: {
     telephone: false,
   },
   openGraph: {
-    title: 'Mirror Counter',
-    description: 'A fast, simple life counter for Magic: The Gathering 1x1 format.',
-    type: 'website',
-    siteName: 'Mirror Counter',
+    title: "Mirror Counter",
+    description:
+      "A fast, simple life counter for Magic: The Gathering 1x1 format.",
+    type: "website",
+    siteName: "Mirror Counter",
   },
   twitter: {
-    card: 'summary',
-    title: 'Mirror Counter',
-    description: 'A fast, simple life counter for Magic: The Gathering 1x1 format.',
+    card: "summary",
+    title: "Mirror Counter",
+    description:
+      "A fast, simple life counter for Magic: The Gathering 1x1 format.",
   },
-}
+};
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#f4f3f8',
-  viewportFit: 'cover',
-  width: 'device-width',
+  colorScheme: "light",
+  themeColor: "#f4f3f8",
+  viewportFit: "cover",
+  width: "device-width",
   initialScale: 1,
   minimumScale: 1,
   maximumScale: 5,
   userScalable: true,
-}
+};
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function RootLayout({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`bg-background ${varelaRound.className}`}>
       <head>
@@ -53,12 +59,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="antialiased">
-        <HapticProvider>
-          {children}
-        </HapticProvider>
+        {children}
         <script src="/register-sw.js" />
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        {process.env.NODE_ENV === "production" && (
+          <div>
+            <SpeedInsights />
+            <Analytics />
+          </div>
+        )}
       </body>
     </html>
-  )
+  );
 }
