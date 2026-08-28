@@ -154,14 +154,14 @@ export default function LifeCounter() {
         {showTime && <div className="current-time">{currentTime}</div>}
       </div>
 
-      <Dialog isOpen={settingsId !== null} onClose={() => setSettingsId(null)} icon={Settings2} eyebrow="SETTINGS" title={settingsId === -1 ? 'Game configuration' : activePlayer?.name ?? ''}>
+      <Dialog isOpen={settingsId !== null} onClose={() => setSettingsId(null)} icon={Settings2} eyebrow="SETTINGS" title={settingsId === -1 ? 'Game configuration' : activePlayer?.name ?? ''} isInverted={settingsId !== -1 ? activePlayer?.inverted : undefined}>
         {settingsId === -1 ? (
           <GameSettings startLife={startLife} historyDelay={historyDelay} closeRadialOnDialog={closeRadialOnDialog} showTime={showTime} darkMode={darkMode} showPlayerName={showPlayerName} showFloatingNumbers={showFloatingNumbers} onStartLifeChange={setStartLife} onHistoryDelayChange={setHistoryDelay} onCloseRadialOnDialogChange={setCloseRadialOnDialog} onShowTimeChange={setShowTime} onDarkModeChange={setDarkMode} onShowPlayerNameChange={setShowPlayerName} onShowFloatingNumbersChange={setShowFloatingNumbers} />
         ) : (
           <PlayerSettings player={activePlayer} onColorChange={updateColor} onInvertedChange={toggleInverted} />
         )}
       </Dialog>
-      <Dialog isOpen={historyId !== null} onClose={() => setHistoryId(null)} icon={Clock3} eyebrow="HISTORY" title={players.find(p => p.id === historyId)?.name ?? ''}>
+      <Dialog isOpen={historyId !== null} onClose={() => setHistoryId(null)} icon={Clock3} eyebrow="HISTORY" title={players.find(p => p.id === historyId)?.name ?? ''} isInverted={players.find(p => p.id === historyId)?.inverted}>
         <HistoryContent history={players.find(p => p.id === historyId)?.history ?? []} />
       </Dialog>
       <Dialog isOpen={aboutOpen} onClose={() => setAboutOpen(false)} icon={Info} eyebrow="ABOUT" title="Mirror Counter">
