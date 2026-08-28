@@ -23,7 +23,7 @@
 }
 html {
     background: #111116;
-    height: 100vh;
+    height: 100dvh;
 }
 body {
     margin: 0;
@@ -32,7 +32,7 @@ body {
     background: #111116;
     color: var(--foreground);
     font-family: var(--font-sans);
-    height: 100vh;
+    height: 100dvh;
 }
 button,
 input {
@@ -43,7 +43,7 @@ button {
 }
 .counter-shell {
     width: 100vw;
-    height: 100vh;
+    height: 100dvh;
     display: flex;
     padding-bottom: env(safe-area-inset-bottom);
     box-sizing: border-box;
