@@ -1,6 +1,6 @@
 {
-  "name": "Mirror Table — Magic 1x1 life tracker",
-  "short_name": "Mirror Table",
+  "name": "Mirror Counter — Magic 1x1 life tracker",
+  "short_name": "Mirror Counter",
   "description": "A fast, simple life counter for Magic: The Gathering 1x1 format.",
   "start_url": "/",
   "scope": "/",
