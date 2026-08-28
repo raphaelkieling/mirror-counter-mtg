@@ -32,6 +32,7 @@ export default function LifeCounter() {
   const [historyDelay, setHistoryDelay] = useState(2)
   const [closeRadialOnDialog, setCloseRadialOnDialog] = useState(true)
   const [showTime, setShowTime] = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
   const [currentTime, setCurrentTime] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [pendingHistoryIds, setPendingHistoryIds] = useState<Set<number>>(new Set())
@@ -52,19 +53,29 @@ export default function LifeCounter() {
         setHistoryDelay(value.historyDelay ?? 2)
         setCloseRadialOnDialog(value.closeRadialOnDialog ?? true)
         setShowTime(value.showTime ?? false)
+        setDarkMode(value.darkMode ?? false)
       } catch { /* use defaults */ }
     }
+
     setHydrated(true)
   }, [])
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  }, [darkMode])
 
   useEffect(() => {
     if (!hydrated) return
     const timeout = window.setTimeout(() => {
       const playersToSave = players.map(({ id, name, color, life, inverted, history }) => ({ id, name, color, life, inverted, history }))
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players: playersToSave, startLife, historyDelay, closeRadialOnDialog, showTime }))
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players: playersToSave, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode }))
     }, 500)
     return () => window.clearTimeout(timeout)
-  }, [players, startLife, historyDelay, closeRadialOnDialog, showTime, hydrated])
+  }, [players, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode, hydrated])
 
   useEffect(() => {
     if (!showTime) return
@@ -137,7 +148,7 @@ export default function LifeCounter() {
 
       <Dialog isOpen={settingsId !== null} onClose={() => setSettingsId(null)} icon={Settings2} eyebrow="SETTINGS" title={settingsId === -1 ? 'Game configuration' : activePlayer?.name ?? ''}>
         {settingsId === -1 ? (
-          <GameSettings startLife={startLife} historyDelay={historyDelay} closeRadialOnDialog={closeRadialOnDialog} showTime={showTime} onStartLifeChange={setStartLife} onHistoryDelayChange={setHistoryDelay} onCloseRadialOnDialogChange={setCloseRadialOnDialog} onShowTimeChange={setShowTime} />
+          <GameSettings startLife={startLife} historyDelay={historyDelay} closeRadialOnDialog={closeRadialOnDialog} showTime={showTime} darkMode={darkMode} onStartLifeChange={setStartLife} onHistoryDelayChange={setHistoryDelay} onCloseRadialOnDialogChange={setCloseRadialOnDialog} onShowTimeChange={setShowTime} onDarkModeChange={setDarkMode} />
         ) : (
           <PlayerSettings player={activePlayer} onColorChange={updateColor} onInvertedChange={toggleInverted} />
         )}
@@ -150,7 +161,7 @@ export default function LifeCounter() {
           <p>A fast, simple life counter for Magic: The Gathering 1x1 format.</p>
           <p style={{ marginTop: '16px', fontSize: '14px', color: '#666' }}>Created by <strong>Raphael Kieling</strong></p>
           <p style={{ fontSize: '14px', color: '#666' }}>© 2026</p>
-          <button onClick={fillDemoData} style={{ marginTop: '24px', width: '100%', padding: '12px', borderRadius: '8px', border: 'none', background: '#d9d7df', color: '#111116', fontWeight: '700', cursor: 'pointer' }}>Fill out with demo content</button>
+          {process.env.NEXT_PUBLIC_SHOW_DEMO === 'true' && <button onClick={fillDemoData} style={{ marginTop: '24px', width: '100%', padding: '12px', borderRadius: '8px', border: 'none', background: '#d9d7df', color: '#111116', fontWeight: '700', cursor: 'pointer' }}>Fill out with demo content</button>}
         </div>
       </Dialog>
     </main>

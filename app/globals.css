@@ -18,12 +18,25 @@
     --line: #d9d7df;
     --ink-soft: #222228;
 }
+
+html.dark {
+    color-scheme: dark;
+    --background: #0a0a0e;
+    --foreground: #f5f5fa;
+    --muted: #9998a3;
+    --line: #2a2a32;
+    --ink-soft: #e8e8f0;
+}
 * {
     box-sizing: border-box;
 }
 html {
     background: #111116;
     height: 100dvh;
+}
+
+html.dark {
+    background: #0a0a0e;
 }
 body {
     margin: 0;
@@ -33,6 +46,10 @@ body {
     color: var(--foreground);
     font-family: var(--font-sans);
     height: 100dvh;
+}
+
+html.dark body {
+    background: #0a0a0e;
 }
 button,
 input {
@@ -57,6 +74,10 @@ button {
     border-radius: 0;
     padding: 0;
     overflow: hidden;
+}
+
+html.dark .counter-frame {
+    background: #0a0a0e;
 }
 .players-stack {
     width: 100%;
@@ -225,6 +246,16 @@ button {
 .option-button:active {
     transform: scale(0.9);
 }
+
+html.dark .option-button {
+    background: #1a1a22;
+    color: #f5f5fa;
+    border-color: #2a2a32;
+}
+
+html.dark .option-button.is-open {
+    background: #2a2a32;
+}
 .option-button.is-open {
     transform: rotate(45deg);
     background: #e8e7f0;
@@ -272,6 +303,12 @@ button {
 }
 .radial-action:active {
     transform: scale(0.88);
+}
+
+html.dark .radial-action {
+    background: #1a1a22;
+    color: #f5f5fa;
+    border-color: #2a2a32;
 }
 .radial-action-restart {
     left: -88px;
@@ -350,6 +387,10 @@ button {
     scrollbar-gutter: stable;
     animation: sheet-slide-up 0.3s ease-out;
 }
+
+html.dark .settings-sheet {
+    background: #1a1a22;
+}
 .sheet-heading {
     display: flex;
     justify-content: space-between;
@@ -361,6 +402,11 @@ button {
     padding: 18px 24px 12px 24px;
     z-index: 1;
     border-bottom: 1px solid #d9d7df;
+}
+
+html.dark .sheet-heading {
+    background: #1a1a22;
+    border-bottom-color: #2a2a32;
 }
 h2 {
     margin: 0;
@@ -410,6 +456,10 @@ h2 {
 }
 .swatch:active {
     transform: scale(0.95);
+}
+
+html.dark .swatch {
+    border-color: #1a1a22;
 }
 .swatch.selected {
     box-shadow: 0 0 0 2px #111116;
@@ -479,6 +529,16 @@ h2 {
 }
 .number-btn:active {
     transform: scale(0.92);
+}
+
+html.dark .number-btn {
+    background: #2a2a32;
+    color: #f5f5fa;
+    border-color: var(--line);
+}
+
+html.dark .number-btn:hover {
+    background: #3a3a42;
 }
 .number-value {
     min-width: 40px;
