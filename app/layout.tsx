@@ -1,6 +1,7 @@
 import { Analytics } from '@vercel/analytics/next'
 import { Varela_Round } from 'next/font/google'
 import type { Metadata, Viewport } from 'next'
+import { HapticProvider } from '@/components/haptic-provider'
 import './globals.css'
 
 const varelaRound = Varela_Round({ weight: '400', subsets: ['latin'] })
@@ -52,7 +53,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="antialiased">
-        {children}
+        <HapticProvider>
+          {children}
+        </HapticProvider>
         <script src="/register-sw.js" />
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
