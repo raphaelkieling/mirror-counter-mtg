@@ -25,8 +25,11 @@ export function PlayerPanel({ player, showPlayerName, showFloatingNumbers, onCha
       const sign = delta > 0 ? '+' : ''
       setFloatingText(`${sign}${delta}`)
       setIsHiding(false)
+    } else if (floatingText) {
+      setFloatingText(null)
+      startLifeRef.current = player.life
     }
-  }, [player.life])
+  }, [player.life, floatingText])
 
   useEffect(() => {
     if (floatingText && !hasPendingHistory) {
