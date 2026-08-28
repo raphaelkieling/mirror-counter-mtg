@@ -164,7 +164,7 @@ html.dark .counter-frame {
     gap: 20px;
 }
 .life-value {
-    font-size: 140px !important;
+    font-size: 190px !important;
     font-weight: 500 !important;
     line-height: 0.78 !important;
     font-family: mtg, var(--font-sans), sans-serif !important;
