@@ -115,6 +115,11 @@ button {
     background: transparent;
     padding: 8px;
     font-size: 24px;
+    transition: transform 0.15s ease;
+}
+.icon-button:active,
+.close-button:active {
+    transform: scale(0.9);
 }
 .player-icons {
     display: flex;
@@ -147,6 +152,10 @@ button {
     background: transparent;
     opacity: 0.6;
     font-size: 64px;
+    transition: transform 0.15s ease;
+}
+.life-adjust:active {
+    transform: scale(0.88);
 }
 @media (hover: hover) {
     .life-adjust:hover,
@@ -213,6 +222,9 @@ button {
         background 0.2s;
     z-index: 2;
 }
+.option-button:active {
+    transform: scale(0.9);
+}
 .option-button.is-open {
     transform: rotate(45deg);
     background: #e8e7f0;
@@ -255,6 +267,11 @@ button {
     animation: radial-in 0.18s ease-out both;
     width: 56px;
     height: 56px;
+    transition: transform 0.15s ease;
+    cursor: pointer;
+}
+.radial-action:active {
+    transform: scale(0.88);
 }
 .radial-action-restart {
     left: -88px;
@@ -292,6 +309,24 @@ button {
     flex: 1;
     background: var(--line);
 }
+@keyframes dialog-fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes sheet-slide-up {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
 .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -301,6 +336,7 @@ button {
     justify-content: center;
     background: rgb(16 16 20 / 25%);
     overflow: hidden;
+    animation: dialog-fade-in 0.2s ease-out;
 }
 .settings-sheet {
     width: min(100%, 520px);
@@ -312,6 +348,7 @@ button {
     overflow-x: hidden;
     overflow-y: auto;
     scrollbar-gutter: stable;
+    animation: sheet-slide-up 0.3s ease-out;
 }
 .sheet-heading {
     display: flex;
@@ -371,6 +408,9 @@ h2 {
 .swatch:hover {
     transform: scale(1.05);
 }
+.swatch:active {
+    transform: scale(0.95);
+}
 .swatch.selected {
     box-shadow: 0 0 0 2px #111116;
 }
@@ -398,6 +438,9 @@ h2 {
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
+}
+.checkbox-toggle:active {
+    transform: scale(0.85);
 }
 .number-row {
     display: flex;
@@ -433,6 +476,9 @@ h2 {
 }
 .number-btn:hover {
     background: #e8e7f0;
+}
+.number-btn:active {
+    transform: scale(0.92);
 }
 .number-value {
     min-width: 40px;

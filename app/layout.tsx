@@ -17,6 +17,17 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+  openGraph: {
+    title: 'Mirror Counter — Magic 1x1 life tracker',
+    description: 'A fast, simple life counter for Magic: The Gathering 1x1 format.',
+    type: 'website',
+    siteName: 'Mirror Counter',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Mirror Counter — Magic 1x1 life tracker',
+    description: 'A fast, simple life counter for Magic: The Gathering 1x1 format.',
+  },
 }
 
 export const viewport: Viewport = {
