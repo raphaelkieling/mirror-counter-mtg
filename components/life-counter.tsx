@@ -15,8 +15,8 @@ type Player = { id: number; name: string; color: string; life: number; history: 
 
 const STORAGE_KEY = 'mana-counter-v1'
 const defaultPlayers: Player[] = [
-  { id: 1, name: 'PLAYER 1', color: '#ff174e', life: 20, history: [], inverted: true },
-  { id: 2, name: 'PLAYER 2', color: '#4652f5', life: 20, history: [], inverted: false },
+  { id: 1, name: 'PLAYER 1', color: '#ffffff', life: 20, history: [], inverted: true },
+  { id: 2, name: 'PLAYER 2', color: '#000000', life: 20, history: [], inverted: false },
 ]
 
 function contrast(color: string) {
