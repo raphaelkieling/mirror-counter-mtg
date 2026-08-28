@@ -11,25 +11,28 @@ A fast, simple life counter for Magic: The Gathering 1x1 format.
 🔄 **Rotate display** – Flip 180° for convenient player positioning  
 ⚙️ **Configurable** – Customize start life, history delay, and more  
 🏠 **Install as PWA** – Add to home screen for native app experience  
-🌐 **No internet required** – Works completely offline with service workers  
+🌐 **No internet required** – Works completely offline with service workers
 
-
-<img src="./public/screenshot.png" alt="drawing" width="200"/>
-<img src="./public/screenshot-3.png" alt="drawing" width="200"/>
-
+<div style="display: flex; gap: 1rem; justify-content: center;">
+    <img src="./public/screenshot.png" alt="drawing" width="200"/>
+    <img src="./public/screenshot-3.png" alt="drawing" width="200"/>
+</div>
 
 ## Getting Started
 
 ### Install as PWA (Recommended)
+
 - **iOS**: Tap Share → Add to Home Screen
 - **Android**: Tap menu → Install app
 
 ### Use in Browser
+
 Open [mirror-counter.app](https://mirror-counter-mtg-5r25-six.vercel.app/) and use normally, or enable fullscreen mode in settings (desktop only).
 
 ## Settings
 
 Access settings via the radial menu button:
+
 - **Start life** – Set initial life total (default: 20)
 - **History delay** – Auto-save changes after N seconds (default: 2s)
 - **Fullscreen mode** – Enter fullscreen on desktop
