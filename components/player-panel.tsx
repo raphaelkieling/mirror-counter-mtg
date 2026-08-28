@@ -24,9 +24,9 @@ export function PlayerPanel({ player, onChange, onSettings, onHistory, hasPendin
         </div>
       </div>
       <div className="life-row">
-        <button className="life-adjust" style={{ color: text }} onClick={() => onChange(-1)} aria-label={`Subtract life from ${player.name}`}><Minus size={18} /></button>
+        <button className="life-adjust" style={{ color: text }} onClick={() => onChange(-1)} aria-label={`Subtract life from ${player.name}`}><Minus size={56} /></button>
         <output className="life-value" aria-label={`${player.life} life`}>{player.life}</output>
-        <button className="life-adjust" style={{ color: text }} onClick={() => onChange(1)} aria-label={`Add life to ${player.name}`}><Plus size={18} /></button>
+        <button className="life-adjust" style={{ color: text }} onClick={() => onChange(1)} aria-label={`Add life to ${player.name}`}><Plus size={56} /></button>
       </div>
       <div className="player-footer">
         {hasPendingHistory && <button className="save-history-btn" onClick={onSaveHistory} style={{ color: text }} aria-label="Save history now"><Check size={16} strokeWidth={2.5} /></button>}

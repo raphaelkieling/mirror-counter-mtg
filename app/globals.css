@@ -109,7 +109,8 @@ button {
     display: inline-flex;
     border: 0;
     background: transparent;
-    padding: 5px;
+    padding: 8px;
+    font-size: 24px;
 }
 .player-icons {
     display: flex;
@@ -125,9 +126,10 @@ button {
     gap: 20px;
 }
 .life-value {
-    font:
-        500 clamp(88px, 17vw, 124px)/0.78 var(--font-sans),
-        sans-serif;
+    font-size: 110px !important;
+    font-weight: 500 !important;
+    line-height: 0.78 !important;
+    font-family: var(--font-sans), sans-serif !important;
     letter-spacing: -0.09em;
     font-variant-numeric: tabular-nums;
 }
@@ -135,14 +137,21 @@ button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 45px;
-    height: 45px;
+    width: 120px;
+    height: 120px;
     border: 0;
     background: transparent;
-    opacity: 0.82;
+    opacity: 0.6;
+    font-size: 64px;
 }
-.life-adjust:hover,
-.icon-button:hover {
+@media (hover: hover) {
+    .life-adjust:hover,
+    .icon-button:hover {
+        opacity: 1;
+    }
+}
+.life-adjust:active,
+.icon-button:active {
     opacity: 1;
 }
 .life-caption {
@@ -184,10 +193,10 @@ button {
 }
 .option-button {
     position: absolute;
-    left: -24px;
-    top: -24px;
-    width: 48px;
-    height: 48px;
+    left: -30px;
+    top: -30px;
+    width: 60px;
+    height: 60px;
     display: grid;
     place-items: center;
     border: 2px solid #111116;
@@ -229,31 +238,31 @@ button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
+    gap: 8px;
     border: 2px solid #111116;
     border-radius: 50%;
     background: #fff;
     color: #111116;
-    padding: 12px;
+    padding: 14px;
     box-shadow: 0 5px 14px rgb(0 0 0 / 16%);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     white-space: nowrap;
     animation: radial-in 0.18s ease-out both;
-    width: 48px;
-    height: 48px;
+    width: 56px;
+    height: 56px;
 }
 .radial-action-restart {
-    left: -78px;
-    top: -70px;
+    left: -88px;
+    top: -80px;
 }
 .radial-action-config {
-    left: -24px;
-    top: -90px;
+    left: -28px;
+    top: -100px;
 }
 .radial-action-about {
-    left: 30px;
-    top: -70px;
+    left: 36px;
+    top: -80px;
 }
 @keyframes radial-in {
     from {
@@ -453,7 +462,10 @@ h2 {
 }
 @media (max-width: 560px) {
     .counter-shell {
-        padding: 22px 12px 16px;
+        padding-top: max(0px, env(safe-area-inset-top));
+        padding-left: 12px;
+        padding-right: 12px;
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
     }
     .player-panel {
         min-height: 35svh;
