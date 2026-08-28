@@ -31,6 +31,7 @@ body {
     background: #111116;
     color: var(--foreground);
     font-family: var(--font-sans);
+    padding-bottom: env(safe-area-inset-bottom);
 }
 button,
 input {
@@ -43,8 +44,6 @@ button {
     width: 100vw;
     height: 100svh;
     display: flex;
-    padding-bottom: max(0px, env(safe-area-inset-bottom));
-    box-sizing: border-box;
 }
 .counter-frame {
     width: 100%;
@@ -54,7 +53,9 @@ button {
     border: 0;
     border-radius: 0;
     padding: 0;
+    padding-bottom: env(safe-area-inset-bottom);
     overflow: hidden;
+    box-sizing: border-box;
 }
 .players-stack {
     width: 100%;
