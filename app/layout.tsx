@@ -6,26 +6,26 @@ import './globals.css'
 const varelaRound = Varela_Round({ weight: '400', subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Mirror Counter — Magic 1x1 life tracker',
+  title: 'Mirror Table',
   description: 'A fast, simple life counter for Magic: The Gathering 1x1 format.',
   generator: 'v0.app',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    title: 'Mirror Counter',
+    title: 'Mirror Table',
   },
   formatDetection: {
     telephone: false,
   },
   openGraph: {
-    title: 'Mirror Counter — Magic 1x1 life tracker',
+    title: 'Mirror Table',
     description: 'A fast, simple life counter for Magic: The Gathering 1x1 format.',
     type: 'website',
-    siteName: 'Mirror Counter',
+    siteName: 'Mirror Table',
   },
   twitter: {
     card: 'summary',
-    title: 'Mirror Counter — Magic 1x1 life tracker',
+    title: 'Mirror Table',
     description: 'A fast, simple life counter for Magic: The Gathering 1x1 format.',
   },
 }
@@ -48,7 +48,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <link rel="icon" href="/32.png" type="image/png" />
         <link rel="apple-touch-icon" href="/1024.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-title" content="Mirror Counter" />
+        <meta name="apple-mobile-web-app-title" content="Mirror Table" />
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="antialiased">

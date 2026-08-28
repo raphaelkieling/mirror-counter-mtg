@@ -142,7 +142,7 @@ export default function LifeCounter() {
       <Dialog isOpen={historyId !== null} onClose={() => setHistoryId(null)} icon={Clock3} eyebrow="HISTORY" title={players.find(p => p.id === historyId)?.name ?? ''}>
         <HistoryContent history={players.find(p => p.id === historyId)?.history ?? []} />
       </Dialog>
-      <Dialog isOpen={aboutOpen} onClose={() => setAboutOpen(false)} icon={Info} eyebrow="ABOUT" title="Mirror Counter">
+      <Dialog isOpen={aboutOpen} onClose={() => setAboutOpen(false)} icon={Info} eyebrow="ABOUT" title="Mirror Table">
         <div className="settings-content">
           <p>A fast, simple life counter for Magic: The Gathering 1x1 format.</p>
           <p style={{ marginTop: '16px', fontSize: '14px', color: '#666' }}>Created by <strong>Raphael Kieling</strong></p>
