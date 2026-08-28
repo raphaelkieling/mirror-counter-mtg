@@ -220,7 +220,7 @@ button {
 .current-time {
     position: fixed;
     left: 50%;
-    bottom: 24px;
+    bottom: 60px;
     transform: translateX(-50%);
     font-size: 12px;
     color: #fff;
