@@ -27,6 +27,7 @@ interface PlayerData {
 interface AppStateType {
   players: PlayerData[]
   globalConfig: GameConfig
+  hydrated: boolean
   updatePlayer: (id: number, data: Partial<PlayerData>) => void
   updateConfig: (data: Partial<GameConfig>) => void
 }
@@ -92,7 +93,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <AppStateContext.Provider value={{ players, globalConfig, updatePlayer, updateConfig }}>
+    <AppStateContext.Provider value={{ players, globalConfig, hydrated, updatePlayer, updateConfig }}>
       {children}
     </AppStateContext.Provider>
   )

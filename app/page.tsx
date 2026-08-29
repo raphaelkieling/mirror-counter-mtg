@@ -1,5 +1,5 @@
-import LifeCounter from '@/components/life-counter'
+import { AppShell } from '@/components/app-shell'
 
 export default function Page() {
-  return <LifeCounter />
+  return <AppShell />
 }

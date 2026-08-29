@@ -55,7 +55,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   // Layout
   return (
-    <html lang="en" className={`bg-background ${varelaRound.className}`}>
+    <html lang="en" className={`bg-background ${varelaRound.className}`} suppressHydrationWarning>
       <head>
         <link rel="icon" href="/32.png" type="image/png" />
         <link rel="apple-touch-icon" href="/1024.png" />
