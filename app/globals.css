@@ -424,7 +424,7 @@ html.dark .radial-action {
     justify-content: center;
     background: rgb(16 16 20 / 25%);
     overflow: hidden;
-    animation: dialog-fade-in 0.2s ease-out;
+    animation: dialog-fade-in 0.1s ease-out;
 }
 .settings-sheet {
     width: min(100%, 520px);
@@ -436,7 +436,6 @@ html.dark .radial-action {
     overflow-x: hidden;
     overflow-y: auto;
     scrollbar-gutter: stable;
-    animation: sheet-slide-up 0.3s ease-out;
 }
 
 html.dark .settings-sheet {

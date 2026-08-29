@@ -46,6 +46,11 @@ export default function LifeCounter() {
   const [aboutOpen, setAboutOpen] = useState(false)
   const [hydrated, setHydrated] = useState(false)
   const [rollbackConfirmation, setRollbackConfirmation] = useState<{ playerId: number; value: number } | null>(null)
+  const [holdIncrement, setHoldIncrement] = useState(10)
+  const holdIntervalRef = useRef<number | null>(null)
+  const holdStateRef = useRef<{ playerId: number; direction: number } | null>(null)
+  const holdTimeoutRef = useRef<number | null>(null)
+  const isHoldingRef = useRef(false)
 
   useEffect(() => {
     const stored = window.localStorage.getItem(STORAGE_KEY)
@@ -60,6 +65,7 @@ export default function LifeCounter() {
         setShowTime(value.showTime ?? false)
         setShowPlayerName(value.showPlayerName ?? false)
         setShowFloatingNumbers(value.showFloatingNumbers ?? true)
+        setHoldIncrement(value.holdIncrement ?? 10)
         const isDarkMode = value.darkMode ?? false
         setDarkMode(isDarkMode)
         if (isDarkMode) {
@@ -83,10 +89,10 @@ export default function LifeCounter() {
     if (!hydrated) return
     const timeout = window.setTimeout(() => {
       const playersToSave = players.map(({ id, name, color, life, inverted, history }) => ({ id, name, color, life, inverted, history }))
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players: playersToSave, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode, showPlayerName, showFloatingNumbers }))
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players: playersToSave, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode, showPlayerName, showFloatingNumbers, holdIncrement }))
     }, 500)
     return () => window.clearTimeout(timeout)
-  }, [players, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode, showPlayerName, showFloatingNumbers, hydrated])
+  }, [players, startLife, historyDelay, closeRadialOnDialog, showTime, darkMode, showPlayerName, showFloatingNumbers, holdIncrement, hydrated])
 
   useEffect(() => {
     if (!showTime) return
@@ -148,6 +154,30 @@ export default function LifeCounter() {
       setPendingHistoryIds((prev) => { const newSet = new Set(prev); newSet.delete(id); return newSet })
     }, historyDelay * 1000)
   }
+  function startHold(playerId: number, direction: number) {
+    isHoldingRef.current = false
+    holdStateRef.current = { playerId, direction }
+    if (holdIntervalRef.current) window.clearInterval(holdIntervalRef.current)
+    if (holdTimeoutRef.current) window.clearTimeout(holdTimeoutRef.current)
+    holdTimeoutRef.current = window.setTimeout(() => {
+      isHoldingRef.current = true
+      changeLife(holdStateRef.current!.playerId, holdStateRef.current!.direction * holdIncrement)
+      holdIntervalRef.current = window.setInterval(() => {
+        if (holdStateRef.current) {
+          changeLife(holdStateRef.current.playerId, holdStateRef.current.direction * holdIncrement)
+        }
+      }, 1000)
+    }, 500)
+  }
+  function endHold() {
+    if (holdTimeoutRef.current) window.clearTimeout(holdTimeoutRef.current)
+    if (holdIntervalRef.current) window.clearInterval(holdIntervalRef.current)
+    if (!isHoldingRef.current && holdStateRef.current) {
+      changeLife(holdStateRef.current.playerId, holdStateRef.current.direction)
+    }
+    holdStateRef.current = null
+    isHoldingRef.current = false
+  }
   function saveHistory(id: number) {
     window.clearTimeout(historyTimers.current[id])
     setPlayers((current) => current.map((player) => player.id === id ? { ...player, history: [...player.history, { value: player.life, at: new Date().toISOString() }] } : player))
@@ -194,7 +224,7 @@ export default function LifeCounter() {
     <main className="counter-shell">
       <div className="counter-frame">
         <div className="players-stack">
-          {players.map((player) => <PlayerPanel key={player.id} player={player} showPlayerName={showPlayerName} showFloatingNumbers={showFloatingNumbers} historyDelay={historyDelay} onChange={(delta) => changeLife(player.id, delta)} onSettings={() => setSettingsId(player.id)} onHistory={() => setHistoryId(player.id)} hasPendingHistory={pendingHistoryIds.has(player.id)} onSaveHistory={() => saveHistory(player.id)} />)}
+          {players.map((player) => <PlayerPanel key={player.id} player={player} showPlayerName={showPlayerName} showFloatingNumbers={showFloatingNumbers} historyDelay={historyDelay} onChange={(delta) => changeLife(player.id, delta)} onSettings={() => setSettingsId(player.id)} onHistory={() => setHistoryId(player.id)} hasPendingHistory={pendingHistoryIds.has(player.id)} onSaveHistory={() => saveHistory(player.id)} onHoldStart={(direction) => startHold(player.id, direction)} onHoldEnd={endHold} />)}
         </div>
         <RadialMenu isOpen={menuOpen} onToggle={() => setMenuOpen((open) => !open)} onRestart={restart} onConfig={() => { setSettingsId(-1); if (closeRadialOnDialog) setMenuOpen(false); }} onAbout={() => { setAboutOpen(true); if (closeRadialOnDialog) setMenuOpen(false); }} />
         {showTime && <div className="current-time">{currentTime}</div>}
@@ -202,7 +232,7 @@ export default function LifeCounter() {
 
       <Dialog isOpen={settingsId !== null} onClose={() => setSettingsId(null)} icon={Settings2} eyebrow="SETTINGS" title={settingsId === -1 ? 'Game configuration' : activePlayer?.name ?? ''} isInverted={settingsId !== -1 ? activePlayer?.inverted : undefined}>
         {settingsId === -1 ? (
-          <GameSettings startLife={startLife} historyDelay={historyDelay} closeRadialOnDialog={closeRadialOnDialog} showTime={showTime} darkMode={darkMode} showPlayerName={showPlayerName} showFloatingNumbers={showFloatingNumbers} onStartLifeChange={setStartLife} onHistoryDelayChange={setHistoryDelay} onCloseRadialOnDialogChange={setCloseRadialOnDialog} onShowTimeChange={setShowTime} onDarkModeChange={setDarkMode} onShowPlayerNameChange={setShowPlayerName} onShowFloatingNumbersChange={setShowFloatingNumbers} />
+          <GameSettings startLife={startLife} historyDelay={historyDelay} closeRadialOnDialog={closeRadialOnDialog} showTime={showTime} darkMode={darkMode} showPlayerName={showPlayerName} showFloatingNumbers={showFloatingNumbers} holdIncrement={holdIncrement} onStartLifeChange={setStartLife} onHistoryDelayChange={setHistoryDelay} onCloseRadialOnDialogChange={setCloseRadialOnDialog} onShowTimeChange={setShowTime} onDarkModeChange={setDarkMode} onShowPlayerNameChange={setShowPlayerName} onShowFloatingNumbersChange={setShowFloatingNumbers} onHoldIncrementChange={setHoldIncrement} />
         ) : (
           <PlayerSettings player={activePlayer} onColorChange={updateColor} onInvertedChange={toggleInverted} />
         )}
