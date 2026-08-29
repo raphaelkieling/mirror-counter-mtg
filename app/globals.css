@@ -113,11 +113,17 @@ html.dark .counter-frame {
 .player-panel:last-child {
     border-radius: 24px;
 }
-.player-topline,
-.player-footer {
+.player-topline {
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.player-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    position: relative;
 }
 .player-name {
     opacity: 0.72;
@@ -284,6 +290,40 @@ html.dark .option-button.is-open {
     padding: 6px 12px;
     border-radius: 6px;
     z-index: 1;
+    opacity: 0.8;
+}
+
+.status-counter-badge {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    background: rgba(17, 17, 22, 0.8);
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s ease;
+    color: #fff;
+}
+
+.status-counter-badge:hover {
+    opacity: 1;
+}
+
+.counter-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #fff;
+    font-weight: 700;
+    font-family: "Geist Mono", monospace;
+    font-size: 12px;
+}
+
+.counter-value {
+    min-width: 16px;
+    text-align: center;
+    color: #fff;
 }
 .radial-menu {
     position: absolute;
@@ -464,6 +504,15 @@ h2 {
     margin: 0;
     font-size: 24px;
     letter-spacing: -0.06em;
+    color: var(--foreground);
+}
+.eyebrow {
+    color: var(--muted);
+    margin: 0;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 .close-button {
     color: var(--muted);
@@ -520,7 +569,7 @@ html.dark .swatch {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 26px;
+    margin-bottom: 12px;
 }
 .toggle-label {
     color: var(--muted);
@@ -548,7 +597,7 @@ html.dark .swatch {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 26px;
+    margin-bottom: 12px;
 }
 .number-label {
     color: var(--muted);
