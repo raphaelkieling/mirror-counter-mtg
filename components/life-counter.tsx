@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { Clock3, Settings2, Info, GitBranch } from 'lucide-react'
 import { usePostHog } from 'posthog-js/react'
 import { GameSettings } from './game-settings'
@@ -39,6 +39,13 @@ export default function LifeCounter() {
   const holdStateRef = useRef<{ playerId: number; direction: number } | null>(null)
   const holdTimeoutRef = useRef<number | null>(null)
   const isHoldingRef = useRef(false)
+  const lifeValueRef = useRef<Record<number, number>>({ 1: 20, 2: 20 })
+
+  useEffect(() => {
+    appState.players.forEach(player => {
+      lifeValueRef.current[player.id] = player.life
+    })
+  }, [appState.players])
 
   useEffect(() => {
     if (!gameConfig.showTime) return
@@ -88,37 +95,52 @@ export default function LifeCounter() {
 
   const activePlayer = useMemo(() => appState.players.find((player) => player.id === settingsId), [appState.players, settingsId])
 
-  function changeLife(id: number, delta: number) {
+  const changeLife = useCallback((id: number, delta: number) => {
     if (navigator.vibrate) {
       navigator.vibrate([20, 10, 20])
     }
-    const player = appState.players.find(p => p.id === id)
-    if (!player) return
+    if (gameConfig.soundEnabled) {
+      const audio = new Audio('/switch9.ogg')
+      audio.volume = gameConfig.soundVolume
+      audio.play().catch(() => {})
+    }
 
-    const newLife = Math.max(0, Math.min(99, player.life + delta))
+    const currentLife = lifeValueRef.current[id] || 20
+    const newLife = Math.max(0, Math.min(99, currentLife + delta))
+    lifeValueRef.current[id] = newLife
     appState.updatePlayer(id, { life: newLife })
 
     window.clearTimeout(historyTimers.current[id])
     setPendingHistoryIds((prev) => new Set([...prev, id]))
     historyTimers.current[id] = window.setTimeout(() => {
-      const currentPlayer = appState.players.find(p => p.id === id)
-      if (currentPlayer) {
-        appState.updatePlayer(id, { history: [...currentPlayer.history, { value: newLife, at: new Date().toISOString() }] })
+      const player = appState.players.find(p => p.id === id)
+      if (player) {
+        appState.updatePlayer(id, {
+          history: [...player.history, { value: newLife, at: new Date().toISOString() }]
+        })
       }
       setPendingHistoryIds((prev) => { const newSet = new Set(prev); newSet.delete(id); return newSet })
     }, gameConfig.historyDelay * 1000)
-  }
+  }, [appState, gameConfig.historyDelay])
   function startHold(playerId: number, direction: number) {
     isHoldingRef.current = false
     holdStateRef.current = { playerId, direction }
-    if (holdIntervalRef.current) window.clearInterval(holdIntervalRef.current)
-    if (holdTimeoutRef.current) window.clearTimeout(holdTimeoutRef.current)
+    if (holdIntervalRef.current) {
+      window.clearInterval(holdIntervalRef.current)
+      holdIntervalRef.current = null
+    }
+    if (holdTimeoutRef.current) {
+      window.clearTimeout(holdTimeoutRef.current)
+      holdTimeoutRef.current = null
+    }
+
+    const increment = gameConfig.holdIncrement
     holdTimeoutRef.current = window.setTimeout(() => {
       isHoldingRef.current = true
-      changeLife(holdStateRef.current!.playerId, holdStateRef.current!.direction * gameConfig.holdIncrement)
+      changeLife(playerId, direction * increment)
       holdIntervalRef.current = window.setInterval(() => {
-        if (holdStateRef.current) {
-          changeLife(holdStateRef.current.playerId, holdStateRef.current.direction * gameConfig.holdIncrement)
+        if (isHoldingRef.current) {
+          changeLife(playerId, direction * increment)
         }
       }, 1000)
     }, 500)
@@ -199,7 +221,7 @@ export default function LifeCounter() {
 
       <Dialog isOpen={settingsId !== null} onClose={() => setSettingsId(null)} icon={Settings2} eyebrow="SETTINGS" title={settingsId === -1 ? 'Game configuration' : activePlayer?.name ?? ''} isInverted={settingsId !== -1 ? activePlayer?.inverted : undefined}>
         {settingsId === -1 ? (
-          <GameSettings startLife={gameConfig.startLife} historyDelay={gameConfig.historyDelay} closeRadialOnDialog={gameConfig.closeRadialOnDialog} showTime={gameConfig.showTime} darkMode={gameConfig.darkMode} showFloatingNumbers={gameConfig.showFloatingNumbers} holdIncrement={gameConfig.holdIncrement} onStartLifeChange={(v) => gameConfig.update({ startLife: v })} onHistoryDelayChange={(v) => gameConfig.update({ historyDelay: v })} onCloseRadialOnDialogChange={(v) => gameConfig.update({ closeRadialOnDialog: v })} onShowTimeChange={(v) => gameConfig.update({ showTime: v })} onDarkModeChange={(v) => gameConfig.update({ darkMode: v })} onShowFloatingNumbersChange={(v) => gameConfig.update({ showFloatingNumbers: v })} onHoldIncrementChange={(v) => gameConfig.update({ holdIncrement: v })} />
+          <GameSettings startLife={gameConfig.startLife} historyDelay={gameConfig.historyDelay} closeRadialOnDialog={gameConfig.closeRadialOnDialog} showTime={gameConfig.showTime} darkMode={gameConfig.darkMode} showFloatingNumbers={gameConfig.showFloatingNumbers} holdIncrement={gameConfig.holdIncrement} soundEnabled={gameConfig.soundEnabled} soundVolume={gameConfig.soundVolume} onStartLifeChange={(v) => gameConfig.update({ startLife: v })} onHistoryDelayChange={(v) => gameConfig.update({ historyDelay: v })} onCloseRadialOnDialogChange={(v) => gameConfig.update({ closeRadialOnDialog: v })} onShowTimeChange={(v) => gameConfig.update({ showTime: v })} onDarkModeChange={(v) => gameConfig.update({ darkMode: v })} onShowFloatingNumbersChange={(v) => gameConfig.update({ showFloatingNumbers: v })} onHoldIncrementChange={(v) => gameConfig.update({ holdIncrement: v })} onSoundEnabledChange={(v) => gameConfig.update({ soundEnabled: v })} onSoundVolumeChange={(v) => gameConfig.update({ soundVolume: v })} />
         ) : (
           <PlayerSettings player={activePlayer} onColorChange={updateColor} onInvertedChange={toggleInverted} />
         )}
