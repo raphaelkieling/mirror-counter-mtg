@@ -46,7 +46,7 @@ const defaultConfig: GameConfig = {
   darkMode: false,
   showFloatingNumbers: true,
   holdIncrement: 10,
-  soundEnabled: true,
+  soundEnabled: false,
   soundVolume: 0.3,
 }
 
