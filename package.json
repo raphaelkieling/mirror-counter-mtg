@@ -5,7 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
@@ -27,11 +30,18 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@testing-library/user-event": "^14.6.6",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "jest": "^30.5.0",
+    "jest-environment-jsdom": "^30.5.0",
     "postcss": "^8.5",
     "tailwindcss": "^4.3.3",
+    "ts-node": "^10.9.2",
     "typescript": "5.7.3"
   },
   "allowScripts": {

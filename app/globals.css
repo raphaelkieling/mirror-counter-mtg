@@ -274,7 +274,7 @@ html.dark .option-button.is-open {
 .current-time {
     position: fixed;
     left: 50%;
-    bottom: 60px;
+    bottom: 20px;
     transform: translateX(-50%);
     font-size: 12px;
     color: #fff;
