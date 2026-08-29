@@ -109,6 +109,31 @@ export default function LifeCounter() {
     posthog.capture('dark_mode_toggled', { dark_mode: darkMode })
   }, [darkMode, posthog])
 
+  useEffect(() => {
+    if (!('wakeLock' in navigator)) return
+    let wakeLockSentinel: any = null
+    const requestWakeLock = async () => {
+      try {
+        wakeLockSentinel = await navigator.wakeLock.request('screen')
+      } catch (err) {
+        console.error('Wake Lock failed:', err)
+      }
+    }
+    requestWakeLock()
+    const handleVisibilityChange = async () => {
+      if (document.hidden) {
+        if (wakeLockSentinel) wakeLockSentinel.release()
+      } else {
+        await requestWakeLock()
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (wakeLockSentinel) wakeLockSentinel.release()
+    }
+  }, [])
+
   const activePlayer = useMemo(() => players.find((player) => player.id === settingsId), [players, settingsId])
 
   function changeLife(id: number, delta: number) {
