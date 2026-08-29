@@ -72,6 +72,8 @@ button {
     display: flex;
     padding-bottom: env(safe-area-inset-bottom);
     box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
 }
 .counter-frame {
     width: 100%;
