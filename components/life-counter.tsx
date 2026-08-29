@@ -40,19 +40,12 @@ export default function LifeCounter() {
   const holdTimeoutRef = useRef<number | null>(null)
   const isHoldingRef = useRef(false)
   const lifeValueRef = useRef<Record<number, number>>({ 1: 20, 2: 20 })
-  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     appState.players.forEach(player => {
       lifeValueRef.current[player.id] = player.life
     })
   }, [appState.players])
-
-  useEffect(() => {
-    const audio = new Audio('/switch9.ogg')
-    audio.preload = 'auto'
-    audioRef.current = audio
-  }, [])
 
   useEffect(() => {
     if (!gameConfig.showTime) return
@@ -105,11 +98,6 @@ export default function LifeCounter() {
   const changeLife = useCallback((id: number, delta: number) => {
     if (navigator.vibrate) {
       navigator.vibrate([20, 10, 20])
-    }
-    if (gameConfig.soundEnabled && audioRef.current) {
-      audioRef.current.volume = gameConfig.soundVolume
-      audioRef.current.currentTime = 0
-      audioRef.current.play().catch(() => {})
     }
 
     const currentLife = lifeValueRef.current[id] || 20
@@ -228,7 +216,7 @@ export default function LifeCounter() {
 
       <Dialog isOpen={settingsId !== null} onClose={() => setSettingsId(null)} icon={Settings2} eyebrow="SETTINGS" title={settingsId === -1 ? 'Game configuration' : activePlayer?.name ?? ''} isInverted={settingsId !== -1 ? activePlayer?.inverted : undefined}>
         {settingsId === -1 ? (
-          <GameSettings startLife={gameConfig.startLife} historyDelay={gameConfig.historyDelay} closeRadialOnDialog={gameConfig.closeRadialOnDialog} showTime={gameConfig.showTime} darkMode={gameConfig.darkMode} showFloatingNumbers={gameConfig.showFloatingNumbers} holdIncrement={gameConfig.holdIncrement} soundEnabled={gameConfig.soundEnabled} soundVolume={gameConfig.soundVolume} onStartLifeChange={(v) => gameConfig.update({ startLife: v })} onHistoryDelayChange={(v) => gameConfig.update({ historyDelay: v })} onCloseRadialOnDialogChange={(v) => gameConfig.update({ closeRadialOnDialog: v })} onShowTimeChange={(v) => gameConfig.update({ showTime: v })} onDarkModeChange={(v) => gameConfig.update({ darkMode: v })} onShowFloatingNumbersChange={(v) => gameConfig.update({ showFloatingNumbers: v })} onHoldIncrementChange={(v) => gameConfig.update({ holdIncrement: v })} onSoundEnabledChange={(v) => gameConfig.update({ soundEnabled: v })} onSoundVolumeChange={(v) => gameConfig.update({ soundVolume: v })} />
+          <GameSettings startLife={gameConfig.startLife} historyDelay={gameConfig.historyDelay} closeRadialOnDialog={gameConfig.closeRadialOnDialog} showTime={gameConfig.showTime} darkMode={gameConfig.darkMode} showFloatingNumbers={gameConfig.showFloatingNumbers} holdIncrement={gameConfig.holdIncrement} onStartLifeChange={(v) => gameConfig.update({ startLife: v })} onHistoryDelayChange={(v) => gameConfig.update({ historyDelay: v })} onCloseRadialOnDialogChange={(v) => gameConfig.update({ closeRadialOnDialog: v })} onShowTimeChange={(v) => gameConfig.update({ showTime: v })} onDarkModeChange={(v) => gameConfig.update({ darkMode: v })} onShowFloatingNumbersChange={(v) => gameConfig.update({ showFloatingNumbers: v })} onHoldIncrementChange={(v) => gameConfig.update({ holdIncrement: v })} />
         ) : (
           <PlayerSettings player={activePlayer} onColorChange={updateColor} onInvertedChange={toggleInverted} />
         )}
