@@ -9,17 +9,11 @@ import { HistoryContent } from './history-content'
 import { Dialog } from './dialog'
 import { PlayerPanel } from './player-panel'
 import { RadialMenu } from './radial-menu'
-import { usePlayerData } from '@/contexts/player-data-context'
 import { useGameConfig } from '@/contexts/game-config-context'
+import { useAppState } from '@/contexts/app-state-context'
 
 type HistoryEntry = { value: number; at: string; isRollback?: boolean }
 type Player = { id: number; name: string; color: string; life: number; history: HistoryEntry[]; inverted?: boolean }
-
-const STORAGE_KEY = 'mana-counter-v1'
-const defaultPlayers: Player[] = [
-  { id: 1, name: 'PLAYER 1', color: '#ffffff', life: 20, history: [], inverted: true },
-  { id: 2, name: 'PLAYER 2', color: '#000000', life: 20, history: [], inverted: false },
-]
 
 function contrast(color: string) {
   const hex = color.replace('#', '')
@@ -32,7 +26,7 @@ function contrast(color: string) {
 export default function LifeCounter() {
   const posthog = usePostHog()
   const gameConfig = useGameConfig()
-  const [players, setPlayers] = useState(defaultPlayers)
+  const appState = useAppState()
   const [currentTime, setCurrentTime] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
   const [pendingHistoryIds, setPendingHistoryIds] = useState<Set<number>>(new Set())
@@ -40,51 +34,11 @@ export default function LifeCounter() {
   const [settingsId, setSettingsId] = useState<number | null>(null)
   const [historyId, setHistoryId] = useState<number | null>(null)
   const [aboutOpen, setAboutOpen] = useState(false)
-  const [hydrated, setHydrated] = useState(false)
   const [rollbackConfirmation, setRollbackConfirmation] = useState<{ playerId: number; value: number } | null>(null)
   const holdIntervalRef = useRef<number | null>(null)
   const holdStateRef = useRef<{ playerId: number; direction: number } | null>(null)
   const holdTimeoutRef = useRef<number | null>(null)
   const isHoldingRef = useRef(false)
-  const player1Data = usePlayerData(1)
-  const player2Data = usePlayerData(2)
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      try {
-        const value = JSON.parse(stored)
-        const loadedPlayers = (value.players ?? defaultPlayers).map((p: any) => ({ ...p, history: p.history ?? [] }))
-        setPlayers(loadedPlayers)
-      } catch { /* use defaults */ }
-    }
-
-    setHydrated(true)
-  }, [])
-
-  useEffect(() => {
-    if (!hydrated) return
-    setPlayers((current) =>
-      current.map((p) => {
-        const playerData = p.id === 1 ? player1Data : player2Data
-        return {
-          ...p,
-          color: playerData.color || p.color,
-          inverted: playerData.inverted,
-          name: playerData.name,
-        }
-      })
-    )
-  }, [hydrated])
-
-  useEffect(() => {
-    if (!hydrated) return
-    const timeout = window.setTimeout(() => {
-      const playersToSave = players.map(({ id, name, color, life, inverted, history }) => ({ id, name, color, life, inverted, history }))
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ players: playersToSave }))
-    }, 500)
-    return () => window.clearTimeout(timeout)
-  }, [players, hydrated])
 
   useEffect(() => {
     if (!gameConfig.showTime) return
@@ -132,17 +86,23 @@ export default function LifeCounter() {
     }
   }, [])
 
-  const activePlayer = useMemo(() => players.find((player) => player.id === settingsId), [players, settingsId])
+  const activePlayer = useMemo(() => appState.players.find((player) => player.id === settingsId), [appState.players, settingsId])
 
   function changeLife(id: number, delta: number) {
     if (navigator.vibrate) {
       navigator.vibrate([20, 10, 20])
     }
-    setPlayers((current) => current.map((player) => player.id === id ? { ...player, life: Math.max(0, Math.min(99, player.life + delta)) } : player))
+    const player = appState.players.find(p => p.id === id)
+    if (player) {
+      appState.updatePlayer(id, { life: Math.max(0, Math.min(99, player.life + delta)) })
+    }
     window.clearTimeout(historyTimers.current[id])
     setPendingHistoryIds((prev) => new Set([...prev, id]))
     historyTimers.current[id] = window.setTimeout(() => {
-      setPlayers((current) => current.map((player) => player.id === id ? { ...player, history: [...player.history, { value: player.life, at: new Date().toISOString() }] } : player))
+      const currentPlayer = appState.players.find(p => p.id === id)
+      if (currentPlayer) {
+        appState.updatePlayer(id, { history: [...currentPlayer.history, { value: currentPlayer.life, at: new Date().toISOString() }] })
+      }
       setPendingHistoryIds((prev) => { const newSet = new Set(prev); newSet.delete(id); return newSet })
     }, gameConfig.historyDelay * 1000)
   }
@@ -172,25 +132,40 @@ export default function LifeCounter() {
   }
   function saveHistory(id: number) {
     window.clearTimeout(historyTimers.current[id])
-    setPlayers((current) => current.map((player) => player.id === id ? { ...player, history: [...player.history, { value: player.life, at: new Date().toISOString() }] } : player))
+    const player = appState.players.find(p => p.id === id)
+    if (player) {
+      appState.updatePlayer(id, { history: [...player.history, { value: player.life, at: new Date().toISOString() }] })
+    }
     setPendingHistoryIds((prev) => { const newSet = new Set(prev); newSet.delete(id); return newSet })
   }
   function restart() {
     Object.values(historyTimers.current).forEach(window.clearTimeout)
     historyTimers.current = {}
-    setPlayers((current) => current.map((player) => ({ ...player, life: gameConfig.startLife, history: [] })))
-    player1Data.update({ skulls: 0, energy: 0 })
-    player2Data.update({ skulls: 0, energy: 0 })
+    appState.players.forEach((player) => {
+      appState.updatePlayer(player.id, { life: gameConfig.startLife, history: [], skulls: 0, energy: 0 })
+    })
     setMenuOpen(false)
   }
   function updateColor(color: string) {
     posthog.capture('color_changed', { player_id: settingsId, color })
-    setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, color } : player))
+    if (settingsId !== null && settingsId !== -1) {
+      appState.updatePlayer(settingsId, { color })
+    }
   }
-  function toggleInverted() { setPlayers((current) => current.map((player) => player.id === settingsId ? { ...player, inverted: !player.inverted } : player)) }
+  function toggleInverted() {
+    if (settingsId !== null && settingsId !== -1) {
+      const player = appState.players.find(p => p.id === settingsId)
+      if (player) {
+        appState.updatePlayer(settingsId, { inverted: !player.inverted })
+      }
+    }
+  }
   function applyRollback(playerId: number, value: number) {
     posthog.capture('rollback_applied', { player_id: playerId, new_life: value })
-    setPlayers((current) => current.map((player) => player.id === playerId ? { ...player, life: value, history: [...player.history, { value, at: new Date().toISOString(), isRollback: true }] } : player))
+    const player = appState.players.find(p => p.id === playerId)
+    if (player) {
+      appState.updatePlayer(playerId, { life: value, history: [...player.history, { value, at: new Date().toISOString(), isRollback: true }] })
+    }
     setRollbackConfirmation(null)
   }
   function fillDemoData() {
@@ -205,20 +180,16 @@ export default function LifeCounter() {
       }
       return history
     }
-    setPlayers([
-      { id: 1, name: 'PLAYER 1', color: '#ff174e', life: 13, history: generateHistory(20, 13, 32), inverted: true },
-      { id: 2, name: 'PLAYER 2', color: '#4652f5', life: 21, history: generateHistory(20, 21, 32), inverted: false }
-    ])
+    appState.updatePlayer(1, { name: 'PLAYER 1', color: '#ff174e', life: 13, history: generateHistory(20, 13, 32), inverted: true })
+    appState.updatePlayer(2, { name: 'PLAYER 2', color: '#4652f5', life: 21, history: generateHistory(20, 21, 32), inverted: false })
     setAboutOpen(false)
   }
-
-  if (!hydrated) return null
 
   return (
     <main className="counter-shell">
       <div className="counter-frame">
         <div className="players-stack">
-          {players.map((player) => <PlayerPanel key={player.id} player={player} showFloatingNumbers={gameConfig.showFloatingNumbers} historyDelay={gameConfig.historyDelay} onChange={(delta) => changeLife(player.id, delta)} onSettings={() => setSettingsId(player.id)} onHistory={() => setHistoryId(player.id)} hasPendingHistory={pendingHistoryIds.has(player.id)} onSaveHistory={() => saveHistory(player.id)} onHoldStart={(direction) => startHold(player.id, direction)} onHoldEnd={endHold} />)}
+          {appState.players.map((player) => <PlayerPanel key={player.id} player={player} showFloatingNumbers={gameConfig.showFloatingNumbers} historyDelay={gameConfig.historyDelay} onChange={(delta) => changeLife(player.id, delta)} onSettings={() => setSettingsId(player.id)} onHistory={() => setHistoryId(player.id)} hasPendingHistory={pendingHistoryIds.has(player.id)} onSaveHistory={() => saveHistory(player.id)} onHoldStart={(direction) => startHold(player.id, direction)} onHoldEnd={endHold} />)}
         </div>
         <RadialMenu isOpen={menuOpen} onToggle={() => setMenuOpen((open) => !open)} onRestart={restart} onConfig={() => { setSettingsId(-1); if (gameConfig.closeRadialOnDialog) setMenuOpen(false); }} onAbout={() => { setAboutOpen(true); if (gameConfig.closeRadialOnDialog) setMenuOpen(false); }} />
         {gameConfig.showTime && <div className="current-time">{currentTime}</div>}
@@ -231,8 +202,8 @@ export default function LifeCounter() {
           <PlayerSettings player={activePlayer} onColorChange={updateColor} onInvertedChange={toggleInverted} />
         )}
       </Dialog>
-      <Dialog isOpen={historyId !== null} onClose={() => setHistoryId(null)} icon={Clock3} eyebrow="HISTORY" title={players.find(p => p.id === historyId)?.name ?? ''} isInverted={players.find(p => p.id === historyId)?.inverted}>
-        <HistoryContent history={players.find(p => p.id === historyId)?.history ?? []} onSelectRollback={historyId !== null ? (value) => setRollbackConfirmation({ playerId: historyId, value }) : undefined} />
+      <Dialog isOpen={historyId !== null} onClose={() => setHistoryId(null)} icon={Clock3} eyebrow="HISTORY" title={appState.players.find(p => p.id === historyId)?.name ?? ''} isInverted={appState.players.find(p => p.id === historyId)?.inverted}>
+        <HistoryContent history={appState.players.find(p => p.id === historyId)?.history ?? []} onSelectRollback={historyId !== null ? (value) => setRollbackConfirmation({ playerId: historyId, value }) : undefined} />
       </Dialog>
 
       <Dialog isOpen={rollbackConfirmation !== null} onClose={() => setRollbackConfirmation(null)} eyebrow="CONFIRM" title="Rollback life?">

@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
+import { createContext, useContext, ReactNode } from 'react'
+import { useAppState } from './app-state-context'
 
 interface GameConfig {
   startLife: number
@@ -18,64 +19,11 @@ interface GameConfigContextType extends GameConfig {
 
 const GameConfigContext = createContext<GameConfigContextType | undefined>(undefined)
 
-const STORAGE_KEY = 'mana-counter-v1'
-
-const defaultConfig: GameConfig = {
-  startLife: 20,
-  historyDelay: 2,
-  closeRadialOnDialog: true,
-  showTime: false,
-  darkMode: false,
-  showFloatingNumbers: true,
-  holdIncrement: 10,
-}
-
 export function GameConfigProvider({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useState<GameConfig>(defaultConfig)
-  const [hydrated, setHydrated] = useState(false)
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      try {
-        const value = JSON.parse(stored)
-        setConfig((prev) => ({
-          ...prev,
-          startLife: value.startLife ?? prev.startLife,
-          historyDelay: value.historyDelay ?? prev.historyDelay,
-          closeRadialOnDialog: value.closeRadialOnDialog ?? prev.closeRadialOnDialog,
-          showTime: value.showTime ?? prev.showTime,
-          darkMode: value.darkMode ?? prev.darkMode,
-          showFloatingNumbers: value.showFloatingNumbers ?? prev.showFloatingNumbers,
-          holdIncrement: value.holdIncrement ?? prev.holdIncrement,
-        }))
-      } catch { /* use defaults */ }
-    }
-    setHydrated(true)
-  }, [])
-
-  useEffect(() => {
-    if (!hydrated) return
-    const timeout = window.setTimeout(() => {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(config))
-    }, 500)
-    return () => window.clearTimeout(timeout)
-  }, [config, hydrated])
-
-  useEffect(() => {
-    if (config.darkMode) {
-      document.documentElement.classList.add('dark')
-    } else {
-      document.documentElement.classList.remove('dark')
-    }
-  }, [config.darkMode])
-
-  const update = useCallback((newConfig: Partial<GameConfig>) => {
-    setConfig((prev) => ({ ...prev, ...newConfig }))
-  }, [])
+  const appState = useAppState()
 
   return (
-    <GameConfigContext.Provider value={{ ...config, update }}>
+    <GameConfigContext.Provider value={{ ...appState.globalConfig, update: appState.updateConfig }}>
       {children}
     </GameConfigContext.Provider>
   )

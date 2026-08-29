@@ -1,6 +1,7 @@
 'use client'
 
-import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from 'react'
+import { createContext, useContext, useCallback } from 'react'
+import { useAppState } from './app-state-context'
 
 interface PlayerData {
   name: string
@@ -18,48 +19,25 @@ interface PlayerDataContextType {
 
 const PlayerDataContext = createContext<PlayerDataContextType | undefined>(undefined)
 
-const STORAGE_KEY = 'player-data-v1'
-
-export function PlayerDataProvider({ children }: { children: ReactNode }) {
-  const [playerData, setPlayerData] = useState<Record<number, PlayerData>>({})
-  const [hydrated, setHydrated] = useState(false)
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
-    if (stored) {
-      try {
-        setPlayerData(JSON.parse(stored))
-      } catch { /* use defaults */ }
-    }
-    setHydrated(true)
-  }, [])
-
-  useEffect(() => {
-    if (!hydrated) return
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(playerData))
-  }, [playerData, hydrated])
+export function PlayerDataProvider({ children }: any) {
+  const appState = useAppState()
 
   const getPlayerData = useCallback((playerId: number, defaults?: Partial<PlayerData>): PlayerData => {
-    return playerData[playerId] || {
-      name: `PLAYER ${playerId}`,
-      color: '#ffffff',
-      inverted: playerId === 1,
-      skulls: 0,
-      energy: 0,
-      showCounters: true,
+    const player = appState.players.find((p) => p.id === playerId)
+    return {
+      name: player?.name || `PLAYER ${playerId}`,
+      color: player?.color || '#ffffff',
+      inverted: player?.inverted ?? (playerId === 1),
+      skulls: player?.skulls || 0,
+      energy: player?.energy || 0,
+      showCounters: player?.showCounters ?? true,
       ...defaults,
     }
-  }, [playerData])
+  }, [appState.players])
 
   const updatePlayerData = useCallback((playerId: number, data: Partial<PlayerData>) => {
-    setPlayerData((prev) => ({
-      ...prev,
-      [playerId]: {
-        ...prev[playerId],
-        ...data,
-      },
-    }))
-  }, [])
+    appState.updatePlayer(playerId, data as any)
+  }, [appState])
 
   return (
     <PlayerDataContext.Provider value={{ getPlayerData, updatePlayerData }}>

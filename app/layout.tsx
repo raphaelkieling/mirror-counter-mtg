@@ -3,6 +3,7 @@ import { Varela_Round } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata, Viewport } from "next";
 import { PHProvider } from "@/components/posthog-provider";
+import { AppStateProvider } from "@/contexts/app-state-context";
 import { PlayerDataProvider } from "@/contexts/player-data-context";
 import { GameConfigProvider } from "@/contexts/game-config-context";
 
@@ -63,11 +64,13 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
       </head>
       <body className="antialiased">
-        <GameConfigProvider>
-          <PlayerDataProvider>
-            <PHProvider>{children}</PHProvider>
-          </PlayerDataProvider>
-        </GameConfigProvider>
+        <AppStateProvider>
+          <GameConfigProvider>
+            <PlayerDataProvider>
+              <PHProvider>{children}</PHProvider>
+            </PlayerDataProvider>
+          </GameConfigProvider>
+        </AppStateProvider>
         <script src="/register-sw.js" />
         {process.env.NODE_ENV === "production" && (
           <div>
