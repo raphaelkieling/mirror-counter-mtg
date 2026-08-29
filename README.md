@@ -27,7 +27,7 @@ A fast, simple life counter for Magic: The Gathering 1x1 format.
 
 ### Use in Browser
 
-Open [mirror-counter.app](https://mirror-counter-mtg-5r25-six.vercel.app/) and use normally, or enable fullscreen mode in settings (desktop only).
+Open [app.mirror-counter.cc](https://app.mirror-counter.cc/) and use normally, or enable fullscreen mode in settings (desktop only).
 
 ## Settings
 

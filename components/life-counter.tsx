@@ -40,12 +40,19 @@ export default function LifeCounter() {
   const holdTimeoutRef = useRef<number | null>(null)
   const isHoldingRef = useRef(false)
   const lifeValueRef = useRef<Record<number, number>>({ 1: 20, 2: 20 })
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   useEffect(() => {
     appState.players.forEach(player => {
       lifeValueRef.current[player.id] = player.life
     })
   }, [appState.players])
+
+  useEffect(() => {
+    const audio = new Audio('/switch9.ogg')
+    audio.preload = 'auto'
+    audioRef.current = audio
+  }, [])
 
   useEffect(() => {
     if (!gameConfig.showTime) return
@@ -99,10 +106,10 @@ export default function LifeCounter() {
     if (navigator.vibrate) {
       navigator.vibrate([20, 10, 20])
     }
-    if (gameConfig.soundEnabled) {
-      const audio = new Audio('/switch9.ogg')
-      audio.volume = gameConfig.soundVolume
-      audio.play().catch(() => {})
+    if (gameConfig.soundEnabled && audioRef.current) {
+      audioRef.current.volume = gameConfig.soundVolume
+      audioRef.current.currentTime = 0
+      audioRef.current.play().catch(() => {})
     }
 
     const currentLife = lifeValueRef.current[id] || 20
