@@ -93,15 +93,17 @@ export default function LifeCounter() {
       navigator.vibrate([20, 10, 20])
     }
     const player = appState.players.find(p => p.id === id)
-    if (player) {
-      appState.updatePlayer(id, { life: Math.max(0, Math.min(99, player.life + delta)) })
-    }
+    if (!player) return
+
+    const newLife = Math.max(0, Math.min(99, player.life + delta))
+    appState.updatePlayer(id, { life: newLife })
+
     window.clearTimeout(historyTimers.current[id])
     setPendingHistoryIds((prev) => new Set([...prev, id]))
     historyTimers.current[id] = window.setTimeout(() => {
       const currentPlayer = appState.players.find(p => p.id === id)
       if (currentPlayer) {
-        appState.updatePlayer(id, { history: [...currentPlayer.history, { value: currentPlayer.life, at: new Date().toISOString() }] })
+        appState.updatePlayer(id, { history: [...currentPlayer.history, { value: newLife, at: new Date().toISOString() }] })
       }
       setPendingHistoryIds((prev) => { const newSet = new Set(prev); newSet.delete(id); return newSet })
     }, gameConfig.historyDelay * 1000)
