@@ -54,7 +54,7 @@ export function PlayerPanel({ player, showPlayerName, showFloatingNumbers, onCha
         </div>
       </div>
       <div className="life-row">
-        <button className="life-adjust" style={{ color: text }} onMouseDown={() => onHoldStart?.(-1)} onMouseUp={onHoldEnd} onTouchStart={() => onHoldStart?.(-1)} onTouchEnd={onHoldEnd} aria-label={`Subtract life from ${player.name}`}><Minus size={56} /></button>
+        <button className="life-adjust" style={{ color: text }} onPointerDown={() => onHoldStart?.(-1)} onPointerUp={onHoldEnd} onPointerLeave={onHoldEnd} aria-label={`Subtract life from ${player.name}`}><Minus size={56} /></button>
         <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <output className="life-value" aria-label={`${player.life} life`}>{player.life}</output>
           {showFloatingNumbers && floatingText && (
@@ -74,7 +74,7 @@ export function PlayerPanel({ player, showPlayerName, showFloatingNumbers, onCha
             </div>
           )}
         </div>
-        <button className="life-adjust" style={{ color: text }} onMouseDown={() => onHoldStart?.(1)} onMouseUp={onHoldEnd} onTouchStart={() => onHoldStart?.(1)} onTouchEnd={onHoldEnd} aria-label={`Add life to ${player.name}`}><Plus size={56} /></button>
+        <button className="life-adjust" style={{ color: text }} onPointerDown={() => onHoldStart?.(1)} onPointerUp={onHoldEnd} onPointerLeave={onHoldEnd} aria-label={`Add life to ${player.name}`}><Plus size={56} /></button>
       </div>
       <div className="player-footer">
         {hasPendingHistory && <button className="save-history-btn" onClick={onSaveHistory} style={{ color: text, animation: 'subtle-fade-in 0.3s ease-out' }} aria-label="Save history now"><Check size={16} strokeWidth={2.5} /></button>}
