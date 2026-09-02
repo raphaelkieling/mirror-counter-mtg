@@ -68,30 +68,6 @@ export default function LifeCounter() {
     posthog.capture('dark_mode_toggled', { dark_mode: gameConfig.darkMode })
   }, [gameConfig.darkMode, posthog])
 
-  useEffect(() => {
-    if (!('wakeLock' in navigator)) return
-    let wakeLockSentinel: any = null
-    const requestWakeLock = async () => {
-      try {
-        wakeLockSentinel = await navigator.wakeLock.request('screen')
-      } catch (err) {
-        console.error('Wake Lock failed:', err)
-      }
-    }
-    requestWakeLock()
-    const handleVisibilityChange = async () => {
-      if (document.hidden) {
-        if (wakeLockSentinel) wakeLockSentinel.release()
-      } else {
-        await requestWakeLock()
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
-      if (wakeLockSentinel) wakeLockSentinel.release()
-    }
-  }, [])
 
   const activePlayer = useMemo(() => appState.players.find((player) => player.id === settingsId), [appState.players, settingsId])
 
@@ -216,7 +192,7 @@ export default function LifeCounter() {
 
       <Dialog isOpen={settingsId !== null} onClose={() => setSettingsId(null)} icon={Settings2} eyebrow="SETTINGS" title={settingsId === -1 ? 'Game configuration' : activePlayer?.name ?? ''} isInverted={settingsId !== -1 ? activePlayer?.inverted : undefined}>
         {settingsId === -1 ? (
-          <GameSettings startLife={gameConfig.startLife} historyDelay={gameConfig.historyDelay} closeRadialOnDialog={gameConfig.closeRadialOnDialog} showTime={gameConfig.showTime} darkMode={gameConfig.darkMode} showFloatingNumbers={gameConfig.showFloatingNumbers} holdIncrement={gameConfig.holdIncrement} onStartLifeChange={(v) => gameConfig.update({ startLife: v })} onHistoryDelayChange={(v) => gameConfig.update({ historyDelay: v })} onCloseRadialOnDialogChange={(v) => gameConfig.update({ closeRadialOnDialog: v })} onShowTimeChange={(v) => gameConfig.update({ showTime: v })} onDarkModeChange={(v) => gameConfig.update({ darkMode: v })} onShowFloatingNumbersChange={(v) => gameConfig.update({ showFloatingNumbers: v })} onHoldIncrementChange={(v) => gameConfig.update({ holdIncrement: v })} />
+          <GameSettings startLife={gameConfig.startLife} historyDelay={gameConfig.historyDelay} closeRadialOnDialog={gameConfig.closeRadialOnDialog} showTime={gameConfig.showTime} darkMode={gameConfig.darkMode} showFloatingNumbers={gameConfig.showFloatingNumbers} holdIncrement={gameConfig.holdIncrement} keepAliveScreen={gameConfig.keepAliveScreen} onStartLifeChange={(v) => gameConfig.update({ startLife: v })} onHistoryDelayChange={(v) => gameConfig.update({ historyDelay: v })} onCloseRadialOnDialogChange={(v) => gameConfig.update({ closeRadialOnDialog: v })} onShowTimeChange={(v) => gameConfig.update({ showTime: v })} onDarkModeChange={(v) => gameConfig.update({ darkMode: v })} onShowFloatingNumbersChange={(v) => gameConfig.update({ showFloatingNumbers: v })} onHoldIncrementChange={(v) => gameConfig.update({ holdIncrement: v })} onKeepAliveScreenChange={(v) => gameConfig.update({ keepAliveScreen: v })} />
         ) : (
           <PlayerSettings player={activePlayer} onColorChange={updateColor} onInvertedChange={toggleInverted} />
         )}

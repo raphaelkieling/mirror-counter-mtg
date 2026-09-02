@@ -2,10 +2,14 @@
 
 import { useState, useEffect } from 'react'
 import { useAppState } from '@/contexts/app-state-context'
+import { useGameConfig } from '@/contexts/game-config-context'
+import { useScreenWakeLock } from '@/lib/use-screen-wake-lock'
 import LifeCounter from './life-counter'
 
 export function AppShell() {
   const { hydrated } = useAppState()
+  const { keepAliveScreen } = useGameConfig()
+  useScreenWakeLock(keepAliveScreen)
   const [showLoading, setShowLoading] = useState(true)
   const [fadeOut, setFadeOut] = useState(false)
 

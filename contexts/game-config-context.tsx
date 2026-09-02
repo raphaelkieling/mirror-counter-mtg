@@ -11,6 +11,7 @@ interface GameConfig {
   darkMode: boolean
   showFloatingNumbers: boolean
   holdIncrement: number
+  keepAliveScreen: boolean
 }
 
 interface GameConfigContextType extends GameConfig {

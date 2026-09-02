@@ -10,6 +10,7 @@ interface GameConfig {
   darkMode: boolean
   showFloatingNumbers: boolean
   holdIncrement: number
+  keepAliveScreen: boolean
 }
 
 interface PlayerData {
@@ -44,6 +45,7 @@ const defaultConfig: GameConfig = {
   darkMode: false,
   showFloatingNumbers: true,
   holdIncrement: 10,
+  keepAliveScreen: true,
 }
 
 const defaultPlayers: PlayerData[] = [
