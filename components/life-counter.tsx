@@ -11,6 +11,7 @@ import { PlayerPanel } from './player-panel'
 import { RadialMenu } from './radial-menu'
 import { useGameConfig } from '@/contexts/game-config-context'
 import { useAppState } from '@/contexts/app-state-context'
+import { useScreenWakeLock, type WakeLockStatus } from '@/lib/use-screen-wake-lock'
 
 type HistoryEntry = { value: number; at: string; isRollback?: boolean }
 type Player = { id: number; name: string; color: string; life: number; history: HistoryEntry[]; inverted?: boolean }
@@ -35,11 +36,17 @@ export default function LifeCounter() {
   const [historyId, setHistoryId] = useState<number | null>(null)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [rollbackConfirmation, setRollbackConfirmation] = useState<{ playerId: number; value: number } | null>(null)
+  const [createdByClicks, setCreatedByClicks] = useState(0)
+  const [advancedPanelOpen, setAdvancedPanelOpen] = useState(false)
+  const [wakeLockStatus, setWakeLockStatus] = useState<WakeLockStatus>('idle')
+  const clickTimeoutRef = useRef<number | null>(null)
   const holdIntervalRef = useRef<number | null>(null)
   const holdStateRef = useRef<{ playerId: number; direction: number } | null>(null)
   const holdTimeoutRef = useRef<number | null>(null)
   const isHoldingRef = useRef(false)
   const lifeValueRef = useRef<Record<number, number>>({ 1: 20, 2: 20 })
+
+  useScreenWakeLock(gameConfig.keepAliveScreen, setWakeLockStatus)
 
   useEffect(() => {
     appState.players.forEach(player => {
@@ -180,6 +187,25 @@ export default function LifeCounter() {
     setAboutOpen(false)
   }
 
+  function handleCreatedByClick() {
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current)
+
+    const newClicks = createdByClicks + 1
+    setCreatedByClicks(newClicks)
+
+    if (newClicks >= 3) {
+      setAdvancedPanelOpen(true)
+      setCreatedByClicks(0)
+    } else {
+      clickTimeoutRef.current = window.setTimeout(() => {
+        setCreatedByClicks(0)
+      }, 500)
+    }
+  }
+
+  const isPwaSupported = typeof window !== 'undefined' && 'serviceWorker' in navigator
+  const isWakeLockSupported = typeof window !== 'undefined' && 'wakeLock' in navigator
+
   return (
     <main className="counter-shell">
       <div className="counter-frame">
@@ -213,12 +239,30 @@ export default function LifeCounter() {
       <Dialog isOpen={aboutOpen} onClose={() => setAboutOpen(false)} icon={Info} eyebrow="ABOUT" title="Mirror Counter">
         <div className="settings-content">
           <p>A fast, simple life counter for Magic: The Gathering 1x1 format.</p>
-          <p style={{ marginTop: '16px', fontSize: '14px', color: '#666' }}>Created by <strong>Raphael Kieling</strong></p>
-          <p style={{ fontSize: '14px', color: '#666' }}>© 2026</p>
-          <p style={{ marginTop: '24px', fontSize: '12px', color: '#999', fontFamily: 'monospace' }}>
-            Deployment: {process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_ID}<br />
-            Environment: {process.env.NEXT_PUBLIC_VERCEL_ENV}
+          <p style={{ marginTop: '16px', fontSize: '14px', color: '#666', cursor: 'pointer', userSelect: 'none' }} onClick={handleCreatedByClick}>
+            Created by <strong>Raphael Kieling</strong>
           </p>
+          <p style={{ fontSize: '14px', color: '#666' }}>© 2026</p>
+          {advancedPanelOpen && (
+            <div style={{ marginTop: '24px', padding: '12px', border: '1px solid var(--line)', borderRadius: '8px', backgroundColor: 'rgba(70, 82, 245, 0.05)' }}>
+              <p style={{ fontSize: '12px', color: '#666', margin: '0 0 8px 0', fontWeight: 'bold' }}>Advanced Info</p>
+              <p style={{ fontSize: '12px', color: '#666', margin: '4px 0', fontFamily: 'monospace' }}>PWA: {isPwaSupported ? '✓ Supported' : '✗ Not supported'}</p>
+              <p style={{ fontSize: '12px', color: '#666', margin: '4px 0', fontFamily: 'monospace' }}>
+                Wake Lock: {isWakeLockSupported ? '✓ Supported' : '✗ Not supported'}
+              </p>
+              {isWakeLockSupported && (
+                <p style={{ fontSize: '12px', color: '#666', margin: '4px 0', fontFamily: 'monospace' }}>
+                  Wake Lock Status: {wakeLockStatus === 'acquired' && '✓ Acquired'} {wakeLockStatus === 'released' && '↻ Released'} {wakeLockStatus === 'error' && '✗ Error'} {wakeLockStatus === 'idle' && '○ Idle'}
+                </p>
+              )}
+              <p style={{ fontSize: '12px', color: '#666', margin: '12px 0 4px 0', fontFamily: 'monospace', borderTop: '1px solid rgba(70, 82, 245, 0.1)', paddingTop: '8px' }}>
+                Deployment: {process.env.NEXT_PUBLIC_VERCEL_DEPLOYMENT_ID}
+              </p>
+              <p style={{ fontSize: '12px', color: '#666', margin: '4px 0', fontFamily: 'monospace' }}>
+                Environment: {process.env.NEXT_PUBLIC_VERCEL_ENV}
+              </p>
+            </div>
+          )}
         </div>
       </Dialog>
     </main>
