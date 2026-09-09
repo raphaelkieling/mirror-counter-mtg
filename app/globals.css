@@ -70,7 +70,6 @@ button {
     width: 100vw;
     height: 100dvh;
     display: flex;
-    padding-bottom: env(safe-area-inset-bottom);
     box-sizing: border-box;
     user-select: none;
     -webkit-user-select: none;
@@ -153,6 +152,7 @@ html.dark .counter-frame {
     padding: 8px;
     font-size: 24px;
     transition: transform 0.15s ease;
+    touch-action: manipulation;
 }
 .icon-button:active,
 .close-button:active {
@@ -191,6 +191,7 @@ html.dark .counter-frame {
     font-size: 64px;
     font-family: mtg;
     transition: transform 0.15s ease;
+    touch-action: manipulation;
 }
 .life-adjust:active {
     transform: scale(0.88);
@@ -259,6 +260,7 @@ html.dark .counter-frame {
         transform 0.2s,
         background 0.2s;
     z-index: 2;
+    touch-action: manipulation;
 }
 .option-button:active {
     transform: scale(0.9);
@@ -351,6 +353,7 @@ html.dark .option-button.is-open {
     height: 56px;
     transition: transform 0.15s ease;
     cursor: pointer;
+    touch-action: manipulation;
 }
 .radial-action:active {
     transform: scale(0.88);
