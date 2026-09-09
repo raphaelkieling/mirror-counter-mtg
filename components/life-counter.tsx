@@ -40,10 +40,9 @@ export default function LifeCounter() {
   const [advancedPanelOpen, setAdvancedPanelOpen] = useState(false)
   const [wakeLockStatus, setWakeLockStatus] = useState<WakeLockStatus>('idle')
   const clickTimeoutRef = useRef<number | null>(null)
-  const holdIntervalRef = useRef<number | null>(null)
-  const holdStateRef = useRef<{ playerId: number; direction: number } | null>(null)
-  const holdTimeoutRef = useRef<number | null>(null)
-  const isHoldingRef = useRef(false)
+  const holdIntervalsRef = useRef<Record<number, number>>({})
+  const holdTimeoutsRef = useRef<Record<number, number>>({})
+  const isHoldingRef = useRef<Record<number, boolean>>({})
   const lifeValueRef = useRef<Record<number, number>>({ 1: 20, 2: 20 })
 
   useScreenWakeLock(gameConfig.keepAliveScreen, setWakeLockStatus)
@@ -101,36 +100,38 @@ export default function LifeCounter() {
     }, gameConfig.historyDelay * 1000)
   }, [appState, gameConfig.historyDelay])
   function startHold(playerId: number, direction: number) {
-    isHoldingRef.current = false
-    holdStateRef.current = { playerId, direction }
-    if (holdIntervalRef.current) {
-      window.clearInterval(holdIntervalRef.current)
-      holdIntervalRef.current = null
+    isHoldingRef.current[playerId] = false
+    if (holdTimeoutsRef.current[playerId]) {
+      window.clearTimeout(holdTimeoutsRef.current[playerId])
     }
-    if (holdTimeoutRef.current) {
-      window.clearTimeout(holdTimeoutRef.current)
-      holdTimeoutRef.current = null
+    if (holdIntervalsRef.current[playerId]) {
+      window.clearInterval(holdIntervalsRef.current[playerId])
     }
 
     const increment = gameConfig.holdIncrement
-    holdTimeoutRef.current = window.setTimeout(() => {
-      isHoldingRef.current = true
+    holdTimeoutsRef.current[playerId] = window.setTimeout(() => {
+      isHoldingRef.current[playerId] = true
       changeLife(playerId, direction * increment)
-      holdIntervalRef.current = window.setInterval(() => {
-        if (isHoldingRef.current) {
+      holdIntervalsRef.current[playerId] = window.setInterval(() => {
+        if (isHoldingRef.current[playerId]) {
           changeLife(playerId, direction * increment)
         }
       }, 1000)
     }, 500)
   }
-  function endHold() {
-    if (holdTimeoutRef.current) window.clearTimeout(holdTimeoutRef.current)
-    if (holdIntervalRef.current) window.clearInterval(holdIntervalRef.current)
-    if (!isHoldingRef.current && holdStateRef.current) {
-      changeLife(holdStateRef.current.playerId, holdStateRef.current.direction)
+  function endHold(playerId: number, direction: number) {
+    if (holdTimeoutsRef.current[playerId]) {
+      window.clearTimeout(holdTimeoutsRef.current[playerId])
+      delete holdTimeoutsRef.current[playerId]
     }
-    holdStateRef.current = null
-    isHoldingRef.current = false
+    if (holdIntervalsRef.current[playerId]) {
+      window.clearInterval(holdIntervalsRef.current[playerId])
+      delete holdIntervalsRef.current[playerId]
+    }
+    if (!isHoldingRef.current[playerId]) {
+      changeLife(playerId, direction)
+    }
+    isHoldingRef.current[playerId] = false
   }
   function saveHistory(id: number) {
     window.clearTimeout(historyTimers.current[id])
@@ -143,6 +144,11 @@ export default function LifeCounter() {
   function restart() {
     Object.values(historyTimers.current).forEach(window.clearTimeout)
     historyTimers.current = {}
+    Object.values(holdTimeoutsRef.current).forEach(window.clearTimeout)
+    Object.values(holdIntervalsRef.current).forEach(window.clearInterval)
+    holdTimeoutsRef.current = {}
+    holdIntervalsRef.current = {}
+    isHoldingRef.current = {}
     appState.players.forEach((player) => {
       appState.updatePlayer(player.id, { life: gameConfig.startLife, history: [], skulls: 0, energy: 0 })
     })
@@ -210,7 +216,7 @@ export default function LifeCounter() {
     <main className="counter-shell">
       <div className="counter-frame">
         <div className="players-stack">
-          {appState.players.map((player) => <PlayerPanel key={player.id} player={player} showFloatingNumbers={gameConfig.showFloatingNumbers} historyDelay={gameConfig.historyDelay} onChange={(delta) => changeLife(player.id, delta)} onSettings={() => setSettingsId(player.id)} onHistory={() => setHistoryId(player.id)} hasPendingHistory={pendingHistoryIds.has(player.id)} onSaveHistory={() => saveHistory(player.id)} onHoldStart={(direction) => startHold(player.id, direction)} onHoldEnd={endHold} />)}
+          {appState.players.map((player) => <PlayerPanel key={player.id} player={player} showFloatingNumbers={gameConfig.showFloatingNumbers} historyDelay={gameConfig.historyDelay} onChange={(delta) => changeLife(player.id, delta)} onSettings={() => setSettingsId(player.id)} onHistory={() => setHistoryId(player.id)} hasPendingHistory={pendingHistoryIds.has(player.id)} onSaveHistory={() => saveHistory(player.id)} onHoldStart={(direction) => startHold(player.id, direction)} onHoldEnd={(direction) => endHold(player.id, direction)} />)}
         </div>
         <RadialMenu isOpen={menuOpen} onToggle={() => setMenuOpen((open) => !open)} onRestart={restart} onConfig={() => { setSettingsId(-1); if (gameConfig.closeRadialOnDialog) setMenuOpen(false); }} onAbout={() => { setAboutOpen(true); if (gameConfig.closeRadialOnDialog) setMenuOpen(false); }} />
         {gameConfig.showTime && <div className="current-time">{currentTime}</div>}
